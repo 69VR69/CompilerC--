@@ -16,7 +16,7 @@ namespace CompilerC__
             new Exception("invalid_file_extension","Invalid file extension, file path provide : {0}"),
         };
 
-        public static void printError(string exceptionCode, object? arg = null)
+        public static void PrintError(string exceptionCode, object? arg = null)
         {
             if (arg == null)
                 printError(exceptionCode, null);

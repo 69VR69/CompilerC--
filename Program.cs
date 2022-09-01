@@ -9,14 +9,14 @@
 
             if (args.Length == 0)
             {
-                Utils.printError("invalid_argument");
+                Utils.PrintError("invalid_argument");
                 return;
             }
 
             string filePath = args[0];
             if (!filePath.EndsWith(".c"))
             {
-                Utils.printError("invalid_file_extension", filePath);
+                Utils.PrintError("invalid_file_extension", filePath);
                 return;
             }
 
@@ -24,11 +24,11 @@
 
             #region Load File
 
-            Console.WriteLine("Start file loading");
+            Console.WriteLine("\nStart file loading");
 
             if (!File.Exists(filePath))
             {
-                Utils.printError("file_not_exist", filePath);
+                Utils.PrintError("file_not_exist", filePath);
                 return;
             }
 
@@ -39,12 +39,12 @@
             }
             catch (System.Exception e)
             {
-                Utils.printError("file_read_error", e.Message);
+                Utils.PrintError("file_read_error", e.Message);
             }
 
             if (fileLines == null || fileLines.Count == 0)
             {
-                Utils.printError("file_empty");
+                Utils.PrintError("file_empty");
             }
 
             Console.WriteLine("File loading finished");
@@ -53,13 +53,14 @@
 
             #region Compile
 
-            Console.WriteLine("Start compilation");
+            Console.WriteLine("\nStart compilation");
 
             // Call related methods
             /*
              static currentToken and prevToken;
             next()
              */
+            Console.WriteLine("\nStart lexical scanner");
 
             LexicalScanner lexicalScanner = new LexicalScanner(fileLines);
 
@@ -80,7 +81,9 @@
                 System.Threading.Thread.Sleep(500);
             }
 
-            Console.WriteLine("Compilation finished");
+            Console.WriteLine("Lexical scanner finished");
+
+            Console.WriteLine("\nCompilation finished");
 
             #endregion Compile
         }
