@@ -6,11 +6,73 @@ using System.Threading.Tasks;
 
 namespace CompilerC__
 {
-    internal static class LexicalScanner
+    internal class LexicalScanner
     {
-        public static void next()
+        public List<List<string>> temp1 { get; set; }
+        public List<string> FileLines { get; set; }
+        public int CurrentLine { get; set; }
+
+        public LexicalScanner(List<string> fileLines)
         {
-            // TODO
+            FileLines = fileLines;
+            CurrentLine = 0;
+            temp1 = new List<List<string>>();
+        }
+
+        public List<Token>? Next()
+        {
+            if (CurrentLine >= FileLines.Count)
+                return new List<Token> { new Token(Utils.tokenTypes.Where(t => t.Code == "eos").Select(t => t).ToArray()[0].Code, 0, 0, 0) };
+
+            string fileLine = FileLines[CurrentLine];
+            CurrentLine++;
+            string tokenType = string.Empty;
+            int tokenValue = 0;
+            int nbColumn = 0;
+            char[] spacesDelemiter = Utils.tokenTypes.Where(t => t.Code == "space" && t.MatchedCharacters != null).SelectMany(t => t.MatchedCharacters).ToArray();
+            TokenType[] ignored = Utils.tokenTypes.Where(t => t.Code == "comment" || t.Code == "preproc").Select(t => t).ToArray();
+            TokenType[] tokenTypes = Utils.tokenTypes.Where(t => t.Code != "space" && t.Code != "comment" && t.Code != "preproc").Select(t => t).ToArray();
+
+            // Reformat the line
+            string formattedFileLine = FormatLine(fileLine);
+
+            // Split the line in block of tokens
+            List<string> blocks = formattedFileLine.Split(spacesDelemiter, StringSplitOptions.RemoveEmptyEntries).ToList();
+            temp1.Add(blocks);
+
+            List<Token>? foundToken = new List<Token>();
+            foreach (string b in blocks)
+            {
+                // Stop if found a ignore character
+                if (ignored.Any(i => i.IsMatch(b)))
+                    break;
+
+                // Recognize the token
+                List<TokenType> possibleTokenType = tokenTypes.Where(t => t.IsMatch(b)).ToList();
+                if(possibleTokenType.Count > 1)
+                Console.WriteLine($"possybility for block \"{b}\" : \"{possibleTokenType?.Select( t => t.Code)?.Aggregate((a, b) => $"{a} {b}")}\"");
+                tokenType = (possibleTokenType.Count > 0) ? possibleTokenType.First().Code : null;
+
+                if (!string.IsNullOrWhiteSpace(tokenType))
+                    foundToken.Add(new Token(tokenType, tokenValue, CurrentLine, nbColumn));
+            }
+
+            if (foundToken != null && foundToken.Count > 0)
+            {
+                Console.WriteLine($"initial line : {fileLine}");
+                Utils.AddTokensToBuffer(foundToken);
+            }
+
+            return foundToken;
+        }
+
+        private string FormatLine(string fileLine) // TODO : complete
+        {
+            return fileLine
+                .Replace(";", " ; ")
+                .Replace("(", " ( ")
+                .Replace(")", " ) ")
+                .Replace("#", " # ");
         }
     }
 }
