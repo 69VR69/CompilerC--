@@ -2,7 +2,7 @@
   "profiles": {
     "CompilerC--": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\Users\\Afouques\\OneDrive - Université Paris-Saclay\\Polytech - 4A - PRIVATE\\Spé\\Compilation\\compilerProject\\CompilerC--\\Tests\\test1.c\""
+      "commandLineArgs": "\"D:\\afouq\\documents\\Projets_cours\\CompilerC--\\Tests\\test1.c\""
     }
   }
 }

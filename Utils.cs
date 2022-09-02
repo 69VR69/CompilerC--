@@ -14,19 +14,23 @@ namespace CompilerC__
         {
             new Exception("invalid_argument","You need to use a correct command syntax like : <programName> <fileName.c>"),
             new Exception("invalid_file_extension","Invalid file extension, file path provide : {0}"),
+            new Exception("file_not_exist","File doesn't exist, file path provide : {0}"),
+            new Exception("file_read_error","A file read error occurs, error message : {0}"),
+            new Exception("file_empty","The file is empty, file path provide : {0}"),
         };
 
         public static void PrintError(string exceptionCode, object? arg = null)
         {
             if (arg == null)
-                printError(exceptionCode, null);
+                PrintError(exceptionCode, null);
             else
-                printError(exceptionCode, new object[] { arg });
+                PrintError(exceptionCode, new object[] { arg });
         }
 
-        public static void printError(string exceptionCode, object[]? args)
+        public static void PrintError(string exceptionCode, object[]? args)
         {
-            string message = exceptions.Where(e => e.Code == exceptionCode).First().Message;
+            Exception? ex = exceptions.Where(e => e.Code == exceptionCode).FirstOrDefault();
+            string? message = ex?.Message;
 
             if (string.IsNullOrWhiteSpace(message))
             {
