@@ -2,7 +2,7 @@
   "profiles": {
     "CompilerC--": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\afouq\\documents\\Projets_cours\\CompilerC--\\Tests\\test1.c\""
+      "commandLineArgs": "\"D:\\afouq\\documents\\Projets_cours\\CompilerC--\\Tests\\test1.c\"\r\n--debug"
     }
   }
 }

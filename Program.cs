@@ -20,6 +20,14 @@
                 return;
             }
 
+            if (args.Length > 1)
+            {
+                if (args[1] == "--debug")
+                {
+                    Utils.debugMode = true;
+                }
+            }
+
             #endregion Parse arguments
 
             #region Load File
@@ -60,6 +68,8 @@
              static currentToken and prevToken;
             next()
              */
+            #region Lexical Scanner
+
             Console.WriteLine("\nStart lexical scanner");
 
             LexicalScanner lexicalScanner = new LexicalScanner(fileLines);
@@ -69,7 +79,7 @@
             {
                 tokenType = lexicalScanner?.Next()?.Select(t => t.Type).ToArray();
 
-                if (tokenType != null && tokenType.Count() > 0)
+                if (tokenType != null && tokenType.Length > 0 && Utils.debugMode)
                 {
                     Console.WriteLine($"token found : {tokenType.Aggregate((a, b) => $"{a} {b}")}\n");
                 }
@@ -82,6 +92,8 @@
             }
 
             Console.WriteLine("Lexical scanner finished");
+
+            #endregion Lexical Scanner
 
             Console.WriteLine("\nCompilation finished");
 

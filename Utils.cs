@@ -10,9 +10,10 @@ namespace CompilerC__
     {
         #region Exception Management
 
+        public static bool debugMode = false;
         public static List<Exception> exceptions = new List<Exception>
         {
-            new Exception("invalid_argument","You need to use a correct command syntax like : <programName> <fileName.c>"),
+            new Exception("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug>"),
             new Exception("invalid_file_extension","Invalid file extension, file path provide : {0}"),
             new Exception("file_not_exist","File doesn't exist, file path provide : {0}"),
             new Exception("file_read_error","A file read error occurs, error message : {0}"),
@@ -53,8 +54,6 @@ namespace CompilerC__
 
         #region Token Management
 
-        public static Token currentToken, prevToken;
-        public static List<Token> tokenBuffer = new List<Token>();
         public static List<TokenType> tokenTypes = new List<TokenType>
         {
             new TokenType("eos", regex: "eos" ),
@@ -62,6 +61,7 @@ namespace CompilerC__
             new TokenType("var", regex: "" ), // TODO
             new TokenType("space", ' ','\t'),
             new TokenType("newLine", '\n','\r'),
+            new TokenType("main", regex:"main"),
             new TokenType("preproc", '#'),
             new TokenType("comment", regex: "\\/\\/.*"),
             new TokenType("(", '('),
@@ -69,23 +69,33 @@ namespace CompilerC__
             new TokenType("{", '{'),
             new TokenType("}", '}'),
             new TokenType(";", ';'),
+            new TokenType("+", '+'),
+            new TokenType("-", '-'),
+            new TokenType("*", '*'),
+            new TokenType("/", '/'),
+            new TokenType("%", '%'),
+            new TokenType("&", '&'),
+            new TokenType("&&", regex:"&&"),
+            new TokenType("=", '='),
+            new TokenType("==", regex:"=="),
+            new TokenType(",", ','),
+            new TokenType("!", '!'),
+            new TokenType("!=", regex:"!="),
+            new TokenType("<", '<'),
+            new TokenType("<=", regex:"<="),
+            new TokenType(">", '>'),
+            new TokenType(">=", regex:">="),
+            new TokenType("||", regex:"\\|\\|"),
             new TokenType("return", regex: "return" ),
             new TokenType("int", regex: "int" ),
+            new TokenType("if", regex: "if" ),
+            new TokenType("else", regex: "else" ),
+            new TokenType("for", regex: "for" ),
+            new TokenType("while", regex: "while" ),
+            new TokenType("do", regex: "do" ),
+            new TokenType("break", regex: "break" ),
+            new TokenType("continue", regex: "continue" ),
         };
-        
-        public static Token NextToken()
-        {
-            prevToken = currentToken;
-            currentToken = tokenBuffer.First();
-            tokenBuffer.RemoveAt(0);
-
-            return currentToken;
-        }
-        
-        public static void AddTokensToBuffer(List<Token> newTokens)
-        {
-            tokenBuffer.AddRange(newTokens);
-        }
 
         #endregion Token Management
     }

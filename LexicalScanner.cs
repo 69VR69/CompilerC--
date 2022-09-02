@@ -8,7 +8,9 @@ namespace CompilerC__
 {
     internal class LexicalScanner
     {
-        public List<List<string>> temp1 { get; set; }
+        public Token Current { get; set; }
+        public Token Last { get; set; }
+        public List<Token> TokenBuffer { get; set; }
         public List<string> FileLines { get; set; }
         public int CurrentLine { get; set; }
 
@@ -16,10 +18,12 @@ namespace CompilerC__
         {
             FileLines = fileLines;
             CurrentLine = 0;
-            temp1 = new List<List<string>>();
+            TokenBuffer = new List<Token>();
+            Current = new Token("eos", 0, 0, 0);
+            Last = Current;
         }
 
-        public List<Token>? Next()
+        public List<Token> Next()
         {
             if (CurrentLine >= FileLines.Count)
                 return new List<Token> { new Token(Utils.tokenTypes.Where(t => t.Code == "eos").Select(t => t).ToArray()[0].Code, 0, 0, 0) };
@@ -38,7 +42,6 @@ namespace CompilerC__
 
             // Split the line in block of tokens
             List<string> blocks = formattedFileLine.Split(spacesDelemiter, StringSplitOptions.RemoveEmptyEntries).ToList();
-            temp1.Add(blocks);
 
             List<Token>? foundToken = new List<Token>();
             foreach (string b in blocks)
@@ -49,18 +52,18 @@ namespace CompilerC__
 
                 // Recognize the token
                 List<TokenType> possibleTokenType = tokenTypes.Where(t => t.IsMatch(b)).ToList();
-                if(possibleTokenType.Count > 1)
-                Console.WriteLine($"possybility for block \"{b}\" : \"{possibleTokenType?.Select( t => t.Code)?.Aggregate((a, b) => $"{a} {b}")}\"");
+                if (possibleTokenType.Count > 1 && Utils.debugMode)
+                    Console.WriteLine($"possybility for block \"{b}\" : \"{possibleTokenType?.Select(t => t.Code)?.Aggregate((a, b) => $"{a} {b}")}\"");
                 tokenType = (possibleTokenType.Count > 0) ? possibleTokenType.First().Code : null;
 
                 if (!string.IsNullOrWhiteSpace(tokenType))
                     foundToken.Add(new Token(tokenType, tokenValue, CurrentLine, nbColumn));
             }
 
-            if (foundToken != null && foundToken.Count > 0)
+            if (foundToken != null && foundToken.Count > 0 && Utils.debugMode)
             {
                 Console.WriteLine($"initial line : {fileLine}");
-                Utils.AddTokensToBuffer(foundToken);
+                TokenBuffer.AddRange(foundToken);
             }
 
             return foundToken;
@@ -74,5 +77,14 @@ namespace CompilerC__
                 .Replace(")", " ) ")
                 .Replace("#", " # ");
         }
+        public Token NextToken()
+        {
+            Last = Current;
+            Current = (TokenBuffer.Count <= 0) ? Next()[0] : TokenBuffer.First();
+            TokenBuffer.RemoveAt(0);
+
+            return Last;
+        }
+
     }
 }
