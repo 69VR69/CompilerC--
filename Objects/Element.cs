@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CompilerC__
+namespace CompilerC__.Objects
 {
-    internal class SyntaxScanner
+    internal abstract class Element
     {
     }
 }

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
+using CompilerC__.Objects;
 
 namespace CompilerC__
 {
-    internal class TokenType
+    internal class TokenType : Element
     {
         public string Code { get; set; }
         public List<char>? MatchedCharacters { get; set; }
-
         public Regex? Regex { get; set; }
 
         public TokenType(string code, string regex)
@@ -28,15 +28,15 @@ namespace CompilerC__
 
         public bool IsMatch(string s)
         {
-            if(MatchedCharacters != null && MatchedCharacters.Count > 0)
+            if (MatchedCharacters != null && MatchedCharacters.Count > 0)
             {
-                if(MatchedCharacters.Any(c => c.ToString() == s))
+                if (MatchedCharacters.Any(c => c.ToString() == s))
                     return true;
             }
 
-            if(Regex != null)
+            if (Regex != null)
             {
-                if(Regex.IsMatch(s))
+                if (Regex.IsMatch(s))
                     return true;
             }
 

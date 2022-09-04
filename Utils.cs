@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+
+using CompilerC__.Objects;
 
 namespace CompilerC__
 {
@@ -13,11 +16,16 @@ namespace CompilerC__
         public static bool debugMode = false;
         public static List<Exception> exceptions = new List<Exception>
         {
+            new Exception("unknow_error","An unknowed exception was trown, error message : {0}"),
             new Exception("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug>"),
             new Exception("invalid_file_extension","Invalid file extension, file path provide : {0}"),
             new Exception("file_not_exist","File doesn't exist, file path provide : {0}"),
             new Exception("file_read_error","A file read error occurs, error message : {0}"),
             new Exception("file_empty","The file is empty, file path provide : {0}"),
+            new Exception("unrecognized_element","Unrecognized element '{0}'"),
+            new Exception("unrecognized_grammargroup","Unrecognized grammar group '{0}'"),
+            new Exception("unrecognized_tokentype","Unrecognized token type '{0}'"),
+            new Exception("no_element_group","No element group provide for grammar group '{0}'"),
         };
 
         public static void PrintError(string exceptionCode, object? arg = null)
@@ -54,7 +62,7 @@ namespace CompilerC__
 
         #region Token Management
 
-        public static List<TokenType> tokenTypes = new List<TokenType>
+        public static List<TokenType> tokenTypes = new()
         {
             new TokenType("eos", regex: "eos" ),
             new TokenType("const", regex: "\\d" ),
@@ -65,37 +73,157 @@ namespace CompilerC__
             new TokenType("preproc", '#'),
             new TokenType("comment", regex: "\\/\\/.*"),
             new TokenType("(", '('),
-            new TokenType(")", ')'),
+            new TokenType(")",')'),
             new TokenType("{", '{'),
             new TokenType("}", '}'),
             new TokenType(";", ';'),
             new TokenType("+", '+'),
-            new TokenType("-", '-'),
+            new TokenType(code: "-", '-'),
             new TokenType("*", '*'),
             new TokenType("/", '/'),
             new TokenType("%", '%'),
-            new TokenType("&", '&'),
-            new TokenType("&&", regex:"&&"),
+            new TokenType("&",'&'),
+            new TokenType("&&",regex:"&&"),
             new TokenType("=", '='),
             new TokenType("==", regex:"=="),
             new TokenType(",", ','),
-            new TokenType("!", '!'),
+            new TokenType("!",'!'),
             new TokenType("!=", regex:"!="),
             new TokenType("<", '<'),
             new TokenType("<=", regex:"<="),
-            new TokenType(">", '>'),
-            new TokenType(">=", regex:">="),
+            new TokenType(">",'>'),
+            new TokenType(">=",regex:">="),
             new TokenType("||", regex:"\\|\\|"),
             new TokenType("return", regex: "return" ),
             new TokenType("int", regex: "int" ),
             new TokenType("if", regex: "if" ),
             new TokenType("else", regex: "else" ),
-            new TokenType("for", regex: "for" ),
+            new TokenType("for",regex: "for" ),
             new TokenType("while", regex: "while" ),
             new TokenType("do", regex: "do" ),
             new TokenType("break", regex: "break" ),
-            new TokenType("continue", regex: "continue" ),
+            new TokenType("continue",regex: "continue" ),
         };
+
+        public static List<GrammarGroup> grammarGroups = new()
+        {
+            new GrammarGroup("General",'G'),
+            new GrammarGroup("Function",'F'),
+            new GrammarGroup("Instrustion",'I'),
+            new GrammarGroup("Expression",'E'),
+            new GrammarGroup("Prefix",'P'),
+            new GrammarGroup("Sufix",'S'),
+            new GrammarGroup("Atome",'A'),
+        };
+
+        public static List<NodeType> nodeTypes = new()
+        {
+            new NodeType("const",""),
+        };
+
+        public static List<ElementGroup> elementGroups = new()
+        {
+            #region General
+
+            new ElementGroup(GetGroup("General"),0,
+                new Element[]{GetGroup("Function") },
+                new NodeType[]{GetNodeType("")}),
+            
+            #endregion General
+
+            #region Function
+
+            new ElementGroup(GetGroup("Function"),0,
+                new Element[]{GetGroup("Instrustion") },
+                new NodeType[]{GetNodeType("")}),
+            
+            #endregion Function
+
+            #region Instruction
+
+            new ElementGroup(GetGroup("Instruction"),0,
+                new Element[]{GetGroup("Expression") },
+                new NodeType[]{GetNodeType("")}),
+            
+            #endregion Instruction
+
+            #region Expression
+
+            new ElementGroup(GetGroup("Expression"),0,
+                new Element[]{GetGroup("Prefix") },
+                new NodeType[]{GetNodeType("")}),
+            
+            #endregion Expression
+
+            #region Prefix
+
+            new (GetGroup("Prefix"),0,
+                new Element[]{GetGroup("Sufix") },
+                new NodeType[]{GetNodeType("")}),
+            
+            new (GetGroup("Prefix"),1,
+                new Element[]{GetTokenType("-"),GetGroup("Prefix") },
+                new NodeType[]{GetNodeType("")}),
+            
+            new (GetGroup("Prefix"),1,
+                new {GetTokenType("-"),GetGroup("Prefix") },
+                new("neg_a"),
+            
+            #endregion Prefix
+            
+            #region Sufix
+
+            new ElementGroup(GetGroup("Sufix"),0,
+                new Element[]{GetGroup("Atome") },
+                new NodeType[]{GetNodeType("")}),
+            
+            #endregion Sufix
+           
+            #region Atome
+
+            new (GetGroup("Atome"),0,
+                new {GetTokenType("const") },
+                new (""))
+            
+            #endregion Atome
+        };
+
+        #region Methods
+
+        public static TokenType? GetTokenType(string code)
+        {
+            return tokenTypes.Find(t => t.Code == code);
+        }
+        public static TokenType[]? GetTokenType(params string[] code)
+        {
+            return tokenTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
+        }
+        public static NodeType? GetNodeType(string code)
+        {
+            return nodeTypes.Find(t => t.Code == code);
+        }
+        public static NodeType[]? GetNodeType(params string[] code)
+        {
+            return nodeTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
+        }
+        public static GrammarGroup? GetGroup(string code)
+        {
+            return grammarGroups.Find(g => g.Code == code);
+        }
+        public static GrammarGroup? GetGroup(GrammarGroup grammarGroup)
+        {
+            return grammarGroups.Find(g => g == grammarGroup);
+        }
+        public static GrammarGroup[]? GetGroup(params string[] code)
+        {
+            return grammarGroups.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
+        }
+        public static ElementGroup[]? GetElementGroups(GrammarGroup grammarGroup)
+        {
+            return elementGroups.Where(g => g.Category == grammarGroup).OrderByDescending(g => g.Order).Select(g => g).ToArray();
+        }
+
+        #endregion Methods
 
         #endregion Token Management
     }

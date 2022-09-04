@@ -34,7 +34,7 @@ namespace CompilerC__
             int tokenValue = 0;
             int nbColumn = 0;
             char[] spacesDelemiter = Utils.tokenTypes.Where(t => t.Code == "space" && t.MatchedCharacters != null).SelectMany(t => t.MatchedCharacters).ToArray();
-            TokenType[] ignored = Utils.tokenTypes.Where(t => t.Code == "comment" || t.Code == "preproc").Select(t => t).ToArray();
+            TokenType[] ignored = Utils.GetTokenType("comment", "preproc");
             TokenType[] tokenTypes = Utils.tokenTypes.Where(t => t.Code != "space" && t.Code != "comment" && t.Code != "preproc").Select(t => t).ToArray();
 
             // Reformat the line
@@ -63,6 +63,7 @@ namespace CompilerC__
             if (foundToken != null && foundToken.Count > 0 && Utils.debugMode)
             {
                 Console.WriteLine($"initial line : {fileLine}");
+                Console.WriteLine($"token found : {foundToken.Select(t => t.Type).Aggregate((a, b) => $"{a} {b}")}\n");
                 TokenBuffer.AddRange(foundToken);
             }
 
@@ -84,6 +85,22 @@ namespace CompilerC__
             TokenBuffer.RemoveAt(0);
 
             return Last;
+        }
+
+        public bool Check(TokenType type)
+        {
+            if (Current.Type == type.Code)
+            {
+                NextToken();
+                return true;
+            }
+            return false;
+
+        }
+        public void Accept(TokenType type)
+        {
+            if (!Check(type))
+                Utils.PrintError("");
         }
 
     }
