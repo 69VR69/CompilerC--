@@ -17,7 +17,7 @@ namespace CompilerC__.Objects
             Code = code;
             Sign = sign;
         }
-
+        /*
         public Node Execute(LexicalScanner lexicalScanner)
         {
             ElementGroup[]? egs = Utils.GetElementGroups(this);
@@ -58,8 +58,8 @@ namespace CompilerC__.Objects
 
             return null;
         }
-
-        public Node Execute2(LexicalScanner lexicalScanner)
+        */
+        public Node Execute(LexicalScanner lexicalScanner)
         {
             ElementGroup[]? egs = Utils.GetElementGroups(this);
 
@@ -77,7 +77,7 @@ namespace CompilerC__.Objects
                         if (lexicalScanner.Check(tokenType))
                         {
                             Token current = lexicalScanner.Last;
-                            Node node = eg.GetNextNode();
+                            Node node = root.GetNextNode();
 
                             if (tokenType.Code == "const" || tokenType.Code == "var")
                                 node.Value = current.Value;
@@ -97,6 +97,31 @@ namespace CompilerC__.Objects
                         Utils.PrintError("");
                 }
             }
+            return null;
+        }
+
+        public Node Execute(LexicalScanner lexicalScanner, int pmin = 0)
+        {
+            var arg1 = Utils.GetGroup("Prefix")?.Execute(lexicalScanner);
+
+            while (current.type in Table){
+                var op = current.type;
+
+                var prio = table[op].prio;
+
+                if (prio >= pmin)
+                    next();
+
+                var isLeftAsso = table[op].isLeftAsso;
+
+                var arg2 = E(prio + isLeftAsso);
+
+                arg1 = node(GetNodeType(op), arg1, arg2);
+
+            else
+                    break;
+            }
+            return arg1;
         }
 
         private bool IsGrammarGroup(Element e)

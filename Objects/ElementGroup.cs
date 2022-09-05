@@ -13,15 +13,7 @@ namespace CompilerC__.Objects
         public Element[] Elements { get; set; }
         public NodeType[] NodeTypes { get; set; }
         public Node Node { get; set; }
-
-        public ElementGroup(GrammarGroup category,int order, Element[] elements, NodeType[] nodeTypes)
-        {
-            Category = category;
-            Order = order;
-            Elements = elements;
-            NodeTypes = nodeTypes;
-        }
-
+    
         public ElementGroup(GrammarGroup category,int order, Element[] elements, Node node)
         {
             Category = category;

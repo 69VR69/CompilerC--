@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using CompilerC__.Objects;
+
 namespace CompilerC__.NewFolder
 {
     internal class CodeGenerator
@@ -27,13 +29,33 @@ namespace CompilerC__.NewFolder
         public void GenerateCode()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine(".start")
+            sb.AppendLine(".start");
+
+            sb = GenerateNodeCode(sb);
+
+            sb.AppendLine("\tdebug")
                 .AppendLine("\thalt");
 
             GeneratedCode = sb.ToString();
 
             Console.WriteLine($"Generated assembly code :\n{GeneratedCode}");
             //CreateFileFromString();
+        }
+
+        private StringBuilder GenerateNodeCode(Node root, StringBuilder sb) // TODO : to complete with specials cases
+        {
+            if (root.Type == "const")
+            {
+                sb.AppendLine($"push {root.Value}");
+                return sb;
+            }
+
+            foreach (Node child in root.Childs)
+                sb = GenerateNodeCode(child, sb);
+
+            sb.AppendLine(root.Type);
+
+            return sb;
         }
 
         private void CreateFileFromString()

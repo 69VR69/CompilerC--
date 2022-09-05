@@ -127,7 +127,7 @@ namespace CompilerC__
 
             new ElementGroup(GetGroup("General"),0,
                 new Element[]{GetGroup("Function") },
-                new NodeType[]{GetNodeType("")}),
+                new ()),
             
             #endregion General
 
@@ -135,7 +135,7 @@ namespace CompilerC__
 
             new ElementGroup(GetGroup("Function"),0,
                 new Element[]{GetGroup("Instrustion") },
-                new NodeType[]{GetNodeType("")}),
+                new ()),
             
             #endregion Function
 
@@ -143,7 +143,7 @@ namespace CompilerC__
 
             new ElementGroup(GetGroup("Instruction"),0,
                 new Element[]{GetGroup("Expression") },
-                new NodeType[]{GetNodeType("")}),
+                new ()),
             
             #endregion Instruction
 
@@ -151,7 +151,7 @@ namespace CompilerC__
 
             new ElementGroup(GetGroup("Expression"),0,
                 new Element[]{GetGroup("Prefix") },
-                new NodeType[]{GetNodeType("")}),
+                new ()),
             
             #endregion Expression
 
@@ -159,15 +159,15 @@ namespace CompilerC__
 
             new (GetGroup("Prefix"),0,
                 new Element[]{GetGroup("Sufix") },
-                new NodeType[]{GetNodeType("")}),
+                new ()),
             
             new (GetGroup("Prefix"),1,
                 new Element[]{GetTokenType("-"),GetGroup("Prefix") },
-                new NodeType[]{GetNodeType("")}),
+                new ()),
             
-            new (GetGroup("Prefix"),1,
-                new {GetTokenType("-"),GetGroup("Prefix") },
-                new("neg_a"),
+            new (GetGroup("Prefix"),2,
+                new Element[]{GetTokenType("+"),GetGroup("Prefix") },
+                new("neg_a")),
             
             #endregion Prefix
             
@@ -175,14 +175,14 @@ namespace CompilerC__
 
             new ElementGroup(GetGroup("Sufix"),0,
                 new Element[]{GetGroup("Atome") },
-                new NodeType[]{GetNodeType("")}),
+                new ()),
             
             #endregion Sufix
            
             #region Atome
 
             new (GetGroup("Atome"),0,
-                new {GetTokenType("const") },
+                new Element[]{GetTokenType("const") },
                 new (""))
             
             #endregion Atome
