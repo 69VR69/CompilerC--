@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -103,22 +104,27 @@ namespace CompilerC__.Objects
         public Node Execute(LexicalScanner lexicalScanner, int pmin = 0)
         {
             var arg1 = Utils.GetGroup("Prefix")?.Execute(lexicalScanner);
+            DataTable dt = new("dt");
+            DataRow row;
+            int i = 0;
 
-            while (current.type in Table){
-                var op = current.type;
+            while ((row = dt.Rows[i]).Contains(lexicalScanner.Current.Type))
+            {
+                var op = lexicalScanner.Current.Type;
 
-                var prio = table[op].prio;
+                var prio = dt.prio;
 
                 if (prio >= pmin)
+                {
                     next();
 
-                var isLeftAsso = table[op].isLeftAsso;
+                    var isLeftAsso = table[op].isLeftAsso;
 
-                var arg2 = E(prio + isLeftAsso);
+                    var arg2 = E(prio + isLeftAsso);
 
-                arg1 = node(GetNodeType(op), arg1, arg2);
-
-            else
+                    arg1 = node(GetNodeType(op), arg1, arg2);
+                }
+                else
                     break;
             }
             return arg1;
