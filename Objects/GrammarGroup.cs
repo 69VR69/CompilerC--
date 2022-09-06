@@ -59,7 +59,7 @@ namespace CompilerC__.Objects
 
             return null;
         }
-        */
+
         public Node Execute(LexicalScanner lexicalScanner)
         {
             ElementGroup[]? egs = Utils.GetElementGroups(this);
@@ -126,7 +126,7 @@ namespace CompilerC__.Objects
             }
             return arg1;
         }
-
+        */
         private bool IsGrammarGroup(Element e)
         {
             return e.GetType().IsAssignableFrom(typeof(GrammarGroup));

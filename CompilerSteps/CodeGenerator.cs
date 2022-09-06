@@ -20,9 +20,9 @@ namespace CompilerC__.NewFolder
             get; set;
         }
 
-        public CodeGenerator(SemanticScanner semanticScanner)
+        public CodeGenerator()
         {
-            SemanticScanner = semanticScanner;
+            SemanticScanner = new SemanticScanner();
             GeneratedCode = string.Empty;
         }
 
@@ -31,7 +31,9 @@ namespace CompilerC__.NewFolder
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(".start");
 
-            sb = GenerateNodeCode(sb);
+            Node node = SemanticScanner.SeS();
+
+            sb = GenerateNodeCode(node,sb);
 
             sb.AppendLine("\tdebug")
                 .AppendLine("\thalt");
@@ -69,6 +71,13 @@ namespace CompilerC__.NewFolder
             f.Close();
 
             Console.WriteLine($"File generated at : {f.Name}");
+        }
+
+        public void AddFileToLexical(List<string> fileLines)
+        {
+            LexicalScanner lexicalScanner = SemanticScanner.SyntaxScanner.LexicalScanner;
+            lexicalScanner.FileLines = fileLines;
+            lexicalScanner.NextToken();
         }
     }
 }

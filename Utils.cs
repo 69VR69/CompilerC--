@@ -27,33 +27,31 @@ namespace CompilerC__
             new Exception("unrecognized_grammargroup","Unrecognized grammar group '{0}'"),
             new Exception("unrecognized_tokentype","Unrecognized token type '{0}'"),
             new Exception("no_element_group","No element group provide for grammar group '{0}'"),
+            new Exception("unrecognized_token","Unrecognized token '{0}' at ({1},{2})"),
         };
 
-        public static void PrintError(string exceptionCode, object? arg = null)
+        public static void PrintError(string exceptionCode, bool isBlocking = false, object? arg = null)
         {
             if (arg == null)
-                PrintError(exceptionCode, null);
+                PrintError(exceptionCode, isBlocking, null);
             else
-                PrintError(exceptionCode, new object[] { arg });
+                PrintError(exceptionCode, isBlocking, new object[] { arg });
         }
 
-        public static void PrintError(string exceptionCode, object[]? args)
+        public static void PrintError(string exceptionCode, bool isBlocking = false, params object[]? args)
         {
+            // Form the error message
             Exception? ex = exceptions.Where(e => e.Code == exceptionCode).FirstOrDefault();
             string? message = ex?.Message;
-
             if (string.IsNullOrWhiteSpace(message))
-            {
                 message = "Unknown exception raised";
-            }
-
-            if (args != null)
-            {
+            else if (args != null)
                 for (int i = 0; i < args.Length; i++)
-                {
                     message = message.Replace($"{{{i}}}", args[i].ToString());
-                }
-            }
+
+            // Print or raise exception
+            if (isBlocking)
+                throw new System.Exception(message);
 
             Console.Error.WriteLine(message);
 
@@ -234,7 +232,7 @@ namespace CompilerC__
             Columns = { { "token", typeof(TokenType) }, { "prio", typeof(int) }, { "isLeftAsso", typeof(bool) }, { "node", typeof(NodeType) } },
             Rows = {
                 { GetTokenType("*"), 6, true, GetNodeType("mult") },
-                { GetTokenType("/"), 6, true, GetNodeType("div") }, 
+                { GetTokenType("/"), 6, true, GetNodeType("div") },
             }
         };
     }

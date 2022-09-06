@@ -1,5 +1,7 @@
 ﻿#include <stdio.h>
 int main() {
-	int a = (5);//my variable
-	return 0;
+	5+9;
+	9*6;
+	788-8;
+	6;//my variable
 }

@@ -15,9 +15,9 @@ namespace CompilerC__.NewFolder
             get; set;
         }
 
-        public SemanticScanner(SyntaxScanner syntaxScanner)
+        public SemanticScanner()
         {
-            SyntaxScanner = syntaxScanner;
+            SyntaxScanner = new SyntaxScanner();
         }
 
         public Node SeS()

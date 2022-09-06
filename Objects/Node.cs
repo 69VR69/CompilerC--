@@ -30,6 +30,14 @@ namespace CompilerC__.Objects
             Column = 0;
             Childs = new List<Node>();
         }
+        public Node(Token token, bool withValue = false)
+        {
+            Type = token.Type;
+            Value = withValue? token.Value : null;
+            Line = token.Line;
+            Column = token.Column;
+            Childs = new List<Node>();
+        }
         
         public Node(params Node[] childs)
         {

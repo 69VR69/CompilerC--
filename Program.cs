@@ -20,7 +20,7 @@ namespace CompilerC__
                 string filePath = args[0];
                 if (!filePath.EndsWith(".c"))
                 {
-                    Utils.PrintError("invalid_file_extension", filePath);
+                    Utils.PrintError("invalid_file_extension", false, filePath);
                     return;
                 }
 
@@ -40,7 +40,7 @@ namespace CompilerC__
 
                 if (!File.Exists(filePath))
                 {
-                    Utils.PrintError("file_not_exist", filePath);
+                    Utils.PrintError("file_not_exist", false, filePath);
                     return;
                 }
 
@@ -51,7 +51,7 @@ namespace CompilerC__
                 }
                 catch (System.Exception e)
                 {
-                    Utils.PrintError("file_read_error", e.Message);
+                    Utils.PrintError("file_read_error", false, e.Message);
                 }
 
                 if (fileLines == null || fileLines.Count == 0)
@@ -67,12 +67,8 @@ namespace CompilerC__
 
                 Console.WriteLine("\nStart compilation");
 
-
-                LexicalScanner lexicalScanner = new LexicalScanner(fileLines);
-                SyntaxScanner syntaxScanner = new SyntaxScanner(lexicalScanner);
-                SemanticScanner semanticScanner = new SemanticScanner(syntaxScanner);
-                CodeGenerator codeGenerator = new CodeGenerator(semanticScanner);
-
+                CodeGenerator codeGenerator =  new();
+                codeGenerator.AddFileToLexical(fileLines);
                 codeGenerator.GenerateCode();
 
                 Console.WriteLine("\nCompilation finished");
@@ -82,7 +78,7 @@ namespace CompilerC__
             }
             catch (System.Exception e)
             {
-                Utils.PrintError("unknow_error", e);
+                Utils.PrintError("unknow_error", false, e.ToString());
             }
         }
     }

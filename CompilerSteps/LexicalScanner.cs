@@ -11,12 +11,12 @@ namespace CompilerC__
         public Token Current { get; set; }
         public Token Last { get; set; }
         public List<Token> TokenBuffer { get; set; }
-        public List<string> FileLines { get; set; }
+        public List<string>? FileLines { get; set; }
         public int CurrentLine { get; set; }
 
-        public LexicalScanner(List<string> fileLines)
+        public LexicalScanner()
         {
-            FileLines = fileLines;
+            FileLines = null;
             CurrentLine = 0;
             TokenBuffer = new List<Token>();
             Current = new Token("eos", 0, 0, 0);
@@ -81,8 +81,12 @@ namespace CompilerC__
         public Token NextToken()
         {
             Last = Current;
-            Current = (TokenBuffer.Count <= 0) ? Next()[0] : TokenBuffer.First();
-            TokenBuffer.RemoveAt(0);
+
+            while (TokenBuffer.Count <= 0)
+                Next();
+
+            Current = TokenBuffer.First();
+            TokenBuffer?.RemoveAt(0);
 
             return Last;
         }
