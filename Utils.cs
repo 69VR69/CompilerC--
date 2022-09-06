@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -160,11 +161,11 @@ namespace CompilerC__
             new (GetGroup("Prefix"),0,
                 new Element[]{GetGroup("Sufix") },
                 new ()),
-            
+
             new (GetGroup("Prefix"),1,
                 new Element[]{GetTokenType("-"),GetGroup("Prefix") },
                 new ()),
-            
+
             new (GetGroup("Prefix"),2,
                 new Element[]{GetTokenType("+"),GetGroup("Prefix") },
                 new("neg_a")),
@@ -226,5 +227,15 @@ namespace CompilerC__
         #endregion Methods
 
         #endregion Token Management
+
+        public static DataTable dtOperations = new("Operations")
+        {
+            //prio,token,isLeftAsso,nodeType
+            Columns = { { "token", typeof(TokenType) }, { "prio", typeof(int) }, { "isLeftAsso", typeof(bool) }, { "node", typeof(NodeType) } },
+            Rows = {
+                { GetTokenType("*"), 6, true, GetNodeType("mult") },
+                { GetTokenType("/"), 6, true, GetNodeType("div") }, 
+            }
+        };
     }
 }

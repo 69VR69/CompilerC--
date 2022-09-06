@@ -103,26 +103,23 @@ namespace CompilerC__.Objects
 
         public Node Execute(LexicalScanner lexicalScanner, int pmin = 0)
         {
-            var arg1 = Utils.GetGroup("Prefix")?.Execute(lexicalScanner);
-            DataTable dt = new("dt");
+            Node arg1 = Utils.GetGroup("Prefix")?.Execute(lexicalScanner);
             DataRow row;
+            string op;
             int i = 0;
 
-            while ((row = dt.Rows[i]).Contains(lexicalScanner.Current.Type))
+            while ((op = (string)((row = dtOperations.Rows[i])[lexicalScanner.Current.Type])) != null)
             {
-                var op = lexicalScanner.Current.Type;
-
-                var prio = dt.prio;
+                int prio = (int)row["prio"];
 
                 if (prio >= pmin)
                 {
-                    next();
+                    lexicalScanner.NextToken();
 
-                    var isLeftAsso = table[op].isLeftAsso;
+                    Node arg2 = Utils.GetGroup("Expression")?.Execute(lexicalScanner, prio + ((bool)row["isLeftAsso"] ? 1 : 0));
 
-                    var arg2 = E(prio + isLeftAsso);
 
-                    arg1 = node(GetNodeType(op), arg1, arg2);
+                    arg1 = new Node(Utils.GetNodeType(op).Code, arg1, arg2);
                 }
                 else
                     break;

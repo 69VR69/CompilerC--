@@ -23,7 +23,7 @@ namespace CompilerC__
             Last = Current;
         }
 
-        public List<Token> Next()
+        private List<Token> Next()
         {
             if (CurrentLine >= FileLines.Count)
                 return new List<Token> { new Token(Utils.tokenTypes.Where(t => t.Code == "eos").Select(t => t).ToArray()[0].Code, 0, 0, 0) };
@@ -102,6 +102,5 @@ namespace CompilerC__
             if (!Check(type))
                 Utils.PrintError("");
         }
-
     }
 }

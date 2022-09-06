@@ -16,10 +16,48 @@ namespace CompilerC__.NewFolder
             LexicalScanner = lexicalScanner;
         }
 
+        // General
         public Node SS()
         {
-           Node? n =  Utils.GetGroup("General")?.Execute(LexicalScanner);
-            return n; 
+            Node node = Function();
+            LexicalScanner.Accept(Utils.GetTokenType("eos"));
+            return node;
+        }
+
+        private Node Function()
+        {
+            return Instruction();
+        }
+        
+        private Node Instruction()
+        {
+            //if(Check(""))
+            return Expression();
+        }
+        
+        private Node Expression()
+        {
+            return Prefixe();
+        }
+        
+        private Node Prefixe()
+        {
+            return Sufixe();
+        }
+
+        private Node Sufixe()
+        {
+            return Atome();
+        }
+
+        private Node Atome()
+        { 
+            return null; 
+        }
+
+        private bool Check(string tokenType)
+        {
+            return LexicalScanner.Check(Utils.GetTokenType(tokenType));
         }
     }
 }
