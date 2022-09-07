@@ -134,6 +134,7 @@ namespace CompilerC__.NewFolder
             string op;
             int i = 0;
 
+            // to transform as in dtOperation
             while ((op = (string)((row = Utils.dtOperations.Rows[i])[LexicalScanner.Current.Type])) != null)
             {
                 int prio = (int)row["prio"];

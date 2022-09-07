@@ -42,5 +42,22 @@ namespace CompilerC__
 
             return false;
         }
+
+        public string ReplaceInCharacters(string s)
+        {
+            if (MatchedCharacters != null && MatchedCharacters.Count > 0)
+            {
+                foreach (var t in MatchedCharacters)
+                    s = s.Replace(t.ToString(), $" {t} ");
+            }
+
+            if (Regex != null)
+            {
+                foreach (var t in Regex.Matches(s))
+                    s = Regex.Replace(s, $" {t} ");
+            }
+
+            return s;
+        }
     }
 }

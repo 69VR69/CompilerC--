@@ -73,11 +73,14 @@ namespace CompilerC__
 
         private string FormatLine(string fileLine) // TODO : complete
         {
-            return fileLine
-                .Replace(";", " ; ")
-                .Replace("(", " ( ")
-                .Replace(")", " ) ")
-                .Replace("#", " # ");
+            foreach (var t in Utils.tokenTypes)
+                fileLine = t.ReplaceInCharacters(fileLine);
+
+            return fileLine;
+            //.Replace(";", " ; ")
+            //.Replace("(", " ( ")
+            //.Replace(")", " ) ")
+            //.Replace("#", " # ");
         }
         public Token NextToken()
         {

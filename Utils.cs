@@ -228,11 +228,21 @@ namespace CompilerC__
 
         public static DataTable dtOperations = new("Operations")
         {
-            //prio,token,isLeftAsso,nodeType
-            Columns = { { "token", typeof(TokenType) }, { "prio", typeof(int) }, { "isLeftAsso", typeof(bool) }, { "node", typeof(NodeType) } },
+            Columns = { { "token", typeof(string) }, { "prio", typeof(int) }, { "isLeftAsso", typeof(bool) }, { "node", typeof(NodeType) } },
             Rows = {
-                { GetTokenType("*"), 6, true, GetNodeType("mult") },
-                { GetTokenType("/"), 6, true, GetNodeType("div") },
+                { "*", 6, true, GetNodeType("mult") },
+                { "/", 6, true, GetNodeType("div") },
+                { "+", 5, true, GetNodeType("add") },
+                { "-", 5, true, GetNodeType("sub") },
+                { "<", 4, true, GetNodeType("less") },
+                { "<=", 4, true, GetNodeType("lessequal") },
+                { ">", 4, true, GetNodeType("more") },
+                { ">=", 4, true, GetNodeType("moreequal") },
+                { "==", 4, true, GetNodeType("equal") },
+                { "!=", 4, true, GetNodeType("notequal") },
+                { "&&", 3, true, GetNodeType("and") },
+                { "||", 2, true, GetNodeType("or") },
+                { "=", 1, false, GetNodeType("assign") },
             }
         };
     }
