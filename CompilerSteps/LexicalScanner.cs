@@ -38,6 +38,11 @@ namespace CompilerC__
             int tokenValue = 0;
             int nbColumn = 0;
 
+            if(Utils.debugMode)
+            {
+                Console.WriteLine($"initial line : {fileLine}");
+            }
+
             // Reformat the line
             string formattedFileLine = FormatLine(fileLine);
 
@@ -63,7 +68,6 @@ namespace CompilerC__
 
             if (foundToken != null && foundToken.Count > 0 && Utils.debugMode)
             {
-                Console.WriteLine($"initial line : {fileLine}");
                 Console.WriteLine($"token found : {foundToken.Select(t => t.Type).Aggregate((a, b) => $"{a} {b}")}\n");
                 TokenBuffer.AddRange(foundToken);
             }

@@ -130,13 +130,14 @@ namespace CompilerC__.NewFolder
         private Node Execute(int pmin = 0)
         {
             Node arg1 = Prefixe();
-            DataRow row;
-            string op;
             int i = 0;
+            DataRow row;
 
             // to transform as in dtOperation
-            while ((op = (string)((row = Utils.dtOperations.Rows[i])[LexicalScanner.Current.Type])) != null)
+            while (Utils.IsInDataTable(Utils.dtOperations, columnName: "token", value: LexicalScanner.Current.Type))
             {
+                row = Utils.dtOperations.Rows[i];
+                string op = (string)row[LexicalScanner.Current.Type];
                 int prio = (int)row["prio"];
 
                 if (prio >= pmin)
@@ -144,7 +145,6 @@ namespace CompilerC__.NewFolder
                     LexicalScanner.NextToken();
 
                     Node arg2 = Execute(prio + ((bool)row["isLeftAsso"] ? 1 : 0));
-
 
                     arg1 = new Node(Utils.GetNodeType(op).Code, arg1, arg2);
                 }

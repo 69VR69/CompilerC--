@@ -104,89 +104,11 @@ namespace CompilerC__
             new TokenType("continue",regex: "continue" ),
         };
 
-        public static List<GrammarGroup> grammarGroups = new()
-        {
-            new GrammarGroup("General",'G'),
-            new GrammarGroup("Function",'F'),
-            new GrammarGroup("Instrustion",'I'),
-            new GrammarGroup("Expression",'E'),
-            new GrammarGroup("Prefix",'P'),
-            new GrammarGroup("Sufix",'S'),
-            new GrammarGroup("Atome",'A'),
-        };
-
         public static List<NodeType> nodeTypes = new()
         {
             new NodeType("const",""),
         };
-
-        public static List<ElementGroup> elementGroups = new()
-        {
-            #region General
-
-            new ElementGroup(GetGroup("General"),0,
-                new Element[]{GetGroup("Function") },
-                new ()),
-            
-            #endregion General
-
-            #region Function
-
-            new ElementGroup(GetGroup("Function"),0,
-                new Element[]{GetGroup("Instrustion") },
-                new ()),
-            
-            #endregion Function
-
-            #region Instruction
-
-            new ElementGroup(GetGroup("Instruction"),0,
-                new Element[]{GetGroup("Expression") },
-                new ()),
-            
-            #endregion Instruction
-
-            #region Expression
-
-            new ElementGroup(GetGroup("Expression"),0,
-                new Element[]{GetGroup("Prefix") },
-                new ()),
-            
-            #endregion Expression
-
-            #region Prefix
-
-            new (GetGroup("Prefix"),0,
-                new Element[]{GetGroup("Sufix") },
-                new ()),
-
-            new (GetGroup("Prefix"),1,
-                new Element[]{GetTokenType("-"),GetGroup("Prefix") },
-                new ()),
-
-            new (GetGroup("Prefix"),2,
-                new Element[]{GetTokenType("+"),GetGroup("Prefix") },
-                new("neg_a")),
-            
-            #endregion Prefix
-            
-            #region Sufix
-
-            new ElementGroup(GetGroup("Sufix"),0,
-                new Element[]{GetGroup("Atome") },
-                new ()),
-            
-            #endregion Sufix
-           
-            #region Atome
-
-            new (GetGroup("Atome"),0,
-                new Element[]{GetTokenType("const") },
-                new (""))
-            
-            #endregion Atome
-        };
-
+        
         #region Methods
 
         public static TokenType? GetTokenType(string code)
@@ -204,22 +126,6 @@ namespace CompilerC__
         public static NodeType[]? GetNodeType(params string[] code)
         {
             return nodeTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
-        }
-        public static GrammarGroup? GetGroup(string code)
-        {
-            return grammarGroups.Find(g => g.Code == code);
-        }
-        public static GrammarGroup? GetGroup(GrammarGroup grammarGroup)
-        {
-            return grammarGroups.Find(g => g == grammarGroup);
-        }
-        public static GrammarGroup[]? GetGroup(params string[] code)
-        {
-            return grammarGroups.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
-        }
-        public static ElementGroup[]? GetElementGroups(GrammarGroup grammarGroup)
-        {
-            return elementGroups.Where(g => g.Category == grammarGroup).OrderByDescending(g => g.Order).Select(g => g).ToArray();
         }
 
         #endregion Methods
@@ -244,6 +150,20 @@ namespace CompilerC__
                 { "||", 2, true, GetNodeType("or") },
                 { "=", 1, false, GetNodeType("assign") },
             }
+        };
+
+        public static bool IsInDataTable(DataTable dt, string columnName, string value)
+        {
+            if (string.IsNullOrEmpty(columnName) || string.IsNullOrEmpty(value))
+                return false;
+            
+            DataRow[]? drResult = dt.Select($"{columnName} = '{value}'");
+            return drResult != null && drResult.Length > 0;
+        }
+
+        public static DataTable dtSymboles = new("Variables")
+        {
+            Columns = { { "id", typeof(string) }, { "type", typeof(string) }, { "adresse", typeof(byte[]) }, { "blockId", typeof(int) } },
         };
     }
 }
