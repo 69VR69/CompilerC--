@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
-using CompilerC__.Objects;
 
-namespace CompilerC__
+namespace CompilerC__.Objects.Types
 {
-    internal class TokenType : Element
+    internal class TokenType
     {
         public string Code { get; set; }
         public List<char>? MatchedCharacters { get; set; }
@@ -23,7 +22,7 @@ namespace CompilerC__
         public TokenType(string code, params char[] matchedCharacters)
         {
             Code = code;
-            MatchedCharacters = matchedCharacters.ToList<char>();
+            MatchedCharacters = matchedCharacters.ToList();
         }
 
         public bool IsMatch(string s)

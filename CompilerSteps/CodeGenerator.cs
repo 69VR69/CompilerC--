@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using CompilerC__.Objects;
 
-namespace CompilerC__.NewFolder
+namespace CompilerC__.CompilerSteps
 {
     internal class CodeGenerator
     {
@@ -33,7 +33,7 @@ namespace CompilerC__.NewFolder
 
             Node node = SemanticScanner.SeS();
 
-            sb = GenerateNodeCode(node,sb);
+            sb = GenerateNodeCode(node, sb);
 
             sb.AppendLine("\tdebug")
                 .AppendLine("\thalt");

@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 using static System.Net.Mime.MediaTypeNames;
 
-namespace CompilerC__.NewFolder
+namespace CompilerC__.CompilerSteps
 {
     internal class SyntaxScanner
     {
@@ -136,8 +136,8 @@ namespace CompilerC__.NewFolder
             // to transform as in dtOperation
             while (Utils.IsInDataTable(Utils.dtOperations, columnName: "token", value: LexicalScanner.Current.Type))
             {
-                row = Utils.dtOperations.Rows[i];
-                string op = (string)row[LexicalScanner.Current.Type];
+                row = Utils.dtOperations.Select($"token = '{LexicalScanner.Current.Type}'")[0];
+                string op = (string)row["token"];
                 int prio = (int)row["prio"];
 
                 if (prio >= pmin)

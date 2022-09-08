@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using CompilerC__.Objects;
 
-namespace CompilerC__.NewFolder
+namespace CompilerC__.CompilerSteps
 {
     internal class SemanticScanner
     {

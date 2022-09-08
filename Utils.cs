@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 using CompilerC__.Objects;
+using CompilerC__.Objects.Types;
 
 namespace CompilerC__
 {
@@ -15,19 +16,19 @@ namespace CompilerC__
         #region Exception Management
 
         public static bool debugMode = false;
-        public static List<Exception> exceptions = new List<Exception>
+        public static List<CompilerException> exceptions = new List<CompilerException>
         {
-            new Exception("unknow_error","An unknowed exception was trown, error message : {0}"),
-            new Exception("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug>"),
-            new Exception("invalid_file_extension","Invalid file extension, file path provide : {0}"),
-            new Exception("file_not_exist","File doesn't exist, file path provide : {0}"),
-            new Exception("file_read_error","A file read error occurs, error message : {0}"),
-            new Exception("file_empty","The file is empty, file path provide : {0}"),
-            new Exception("unrecognized_element","Unrecognized element '{0}'"),
-            new Exception("unrecognized_grammargroup","Unrecognized grammar group '{0}'"),
-            new Exception("unrecognized_tokentype","Unrecognized token type '{0}'"),
-            new Exception("no_element_group","No element group provide for grammar group '{0}'"),
-            new Exception("unrecognized_token","Unrecognized token '{0}' at ({1},{2})"),
+            new CompilerException("unknow_error","An unknowed exception was trown, error message : {0}"),
+            new CompilerException("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug>"),
+            new CompilerException("invalid_file_extension","Invalid file extension, file path provide : {0}"),
+            new CompilerException("file_not_exist","File doesn't exist, file path provide : {0}"),
+            new CompilerException("file_read_error","A file read error occurs, error message : {0}"),
+            new CompilerException("file_empty","The file is empty, file path provide : {0}"),
+            new CompilerException("unrecognized_element","Unrecognized element '{0}'"),
+            new CompilerException("unrecognized_grammargroup","Unrecognized grammar group '{0}'"),
+            new CompilerException("unrecognized_tokentype","Unrecognized token type '{0}'"),
+            new CompilerException("no_element_group","No element group provide for grammar group '{0}'"),
+            new CompilerException("unrecognized_token","Unrecognized token '{0}' at ({1},{2})"),
         };
 
         public static void PrintError(string exceptionCode, bool isBlocking = false, object? arg = null)
@@ -41,7 +42,7 @@ namespace CompilerC__
         public static void PrintError(string exceptionCode, bool isBlocking = false, params object[]? args)
         {
             // Form the error message
-            Exception? ex = exceptions.Where(e => e.Code == exceptionCode).FirstOrDefault();
+            CompilerException? ex = exceptions.Where(e => e.Code == exceptionCode).FirstOrDefault();
             string? message = ex?.Message;
             if (string.IsNullOrWhiteSpace(message))
                 message = "Unknown exception raised";
@@ -58,6 +59,8 @@ namespace CompilerC__
         }
 
         #endregion Exception Management
+
+        #region Objects
 
         #region Token Management
 
@@ -104,10 +107,6 @@ namespace CompilerC__
             new TokenType("continue",regex: "continue" ),
         };
 
-        public static List<NodeType> nodeTypes = new()
-        {
-            new NodeType("const",""),
-        };
         
         #region Methods
 
@@ -119,6 +118,18 @@ namespace CompilerC__
         {
             return tokenTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
         }
+
+        #endregion Methods
+
+        #endregion Token Management
+
+        #region Nodes
+
+        public static List<NodeType> nodeTypes = new()
+        {
+            new NodeType("const",""),
+        };
+
         public static NodeType? GetNodeType(string code)
         {
             return nodeTypes.Find(t => t.Code == code);
@@ -128,29 +139,38 @@ namespace CompilerC__
             return nodeTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
         }
 
-        #endregion Methods
+        #endregion Nodes
 
-        #endregion Token Management
-
-        public static DataTable dtOperations = new("Operations")
+        #region Operators
+        public static List<Operation> operations = new()
         {
-            Columns = { { "token", typeof(string) }, { "prio", typeof(int) }, { "isLeftAsso", typeof(bool) }, { "node", typeof(NodeType) } },
-            Rows = {
-                { "*", 6, true, GetNodeType("mult") },
-                { "/", 6, true, GetNodeType("div") },
-                { "+", 5, true, GetNodeType("add") },
-                { "-", 5, true, GetNodeType("sub") },
-                { "<", 4, true, GetNodeType("less") },
-                { "<=", 4, true, GetNodeType("lessequal") },
-                { ">", 4, true, GetNodeType("more") },
-                { ">=", 4, true, GetNodeType("moreequal") },
-                { "==", 4, true, GetNodeType("equal") },
-                { "!=", 4, true, GetNodeType("notequal") },
-                { "&&", 3, true, GetNodeType("and") },
-                { "||", 2, true, GetNodeType("or") },
-                { "=", 1, false, GetNodeType("assign") },
-            }
+            new ("*", 6, true, GetNodeType("mult")),
+            new ("/", 6, true, GetNodeType("div")),
+            new ( "+", 5, true, GetNodeType("add")),
+            new ("-", 5, true, GetNodeType("sub")),
+            new ("<", 4, true, GetNodeType("less") ),
+            new ( "<=", 4, true, GetNodeType("lessequal")),
+            new ( ">", 4, true, GetNodeType("more")),
+            new ( ">=", 4, true, GetNodeType("moreequal")),
+            new ( "==", 4, true, GetNodeType("equal")),
+            new ( "!=", 4, true, GetNodeType("notequal")),
+            new ( "&&", 3, true, GetNodeType("and")),
+            new (  "||", 2, true, GetNodeType("or")),
+            new ( "=", 1, false, GetNodeType("assign")),
         };
+
+        public static Operation? GetOperation(string tokenType)
+        {
+            return operations.Find(t => t.TokenType == tokenType);
+        }
+        public static Operation[]? GetOperation(params string[] tokenType)
+        {
+            return operations.Where(t => tokenType.Contains(t.TokenType)).Select(t => t).ToArray();
+        }
+
+        #endregion Operators
+
+        #endregion Objects
 
         public static bool IsInDataTable(DataTable dt, string columnName, string value)
         {

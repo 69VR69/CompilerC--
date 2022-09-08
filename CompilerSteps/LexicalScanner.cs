@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CompilerC__
+using CompilerC__.Objects;
+using CompilerC__.Objects.Types;
+
+namespace CompilerC__.CompilerSteps
 {
     internal class LexicalScanner
     {
@@ -38,7 +41,7 @@ namespace CompilerC__
             int tokenValue = 0;
             int nbColumn = 0;
 
-            if(Utils.debugMode)
+            if (Utils.debugMode)
             {
                 Console.WriteLine($"initial line : {fileLine}");
             }
@@ -60,7 +63,7 @@ namespace CompilerC__
                 List<TokenType> possibleTokenType = tokenTypes.Where(t => t.IsMatch(b)).ToList();
                 if (possibleTokenType.Count > 1 && Utils.debugMode)
                     Console.WriteLine($"possybility for block \"{b}\" : \"{possibleTokenType?.Select(t => t.Code)?.Aggregate((a, b) => $"{a} {b}")}\"");
-                tokenType = (possibleTokenType.Count > 0) ? possibleTokenType.First().Code : null;
+                tokenType = possibleTokenType.Count > 0 ? possibleTokenType.First().Code : null;
 
                 if (!string.IsNullOrWhiteSpace(tokenType))
                     foundToken.Add(new Token(tokenType, tokenValue, CurrentLine, nbColumn));

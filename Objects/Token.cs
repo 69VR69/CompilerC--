@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CompilerC__.Objects;
-
-namespace CompilerC__
+namespace CompilerC__.Objects
 {
     internal class Token
     {

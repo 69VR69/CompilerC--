@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CompilerC__.Objects
+namespace CompilerC__.Objects.Types
 {
     internal class NodeType
     {
