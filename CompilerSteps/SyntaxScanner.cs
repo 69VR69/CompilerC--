@@ -27,8 +27,8 @@ namespace CompilerC__.CompilerSteps
         {
             Accept("int");
             Accept("main");
-            Accept("(");
-            Accept(")");
+            Accept("parenthesisIn");
+            Accept("parenthesisOut");
             Node node = Function();
             Accept("eos");
             return node;
@@ -43,9 +43,9 @@ namespace CompilerC__.CompilerSteps
         {
             if (Check("if"))
             {
-                Accept("(");
+                Accept("parenthesisIn");
                 Node test = Expression();
-                Accept(")");
+                Accept("parenthesisOut");
                 Node then = Instruction();
 
                 if (Check("else"))
@@ -53,10 +53,10 @@ namespace CompilerC__.CompilerSteps
                 else
                     return new Node("cond", test, then);
             }
-            else if (Check("{"))
+            else if (Check("bracketIn"))
             {
                 Node block = new Node("block");
-                while (!Check("}"))
+                while (!Check("bracketOut"))
                 {
                     block.Childs.Add(Instruction());
                 }
@@ -65,7 +65,7 @@ namespace CompilerC__.CompilerSteps
             else
             {
                 Node e = Expression();
-                Accept(";");
+                Accept("semicolon");
                 return new Node(e);
             }
 
@@ -78,17 +78,17 @@ namespace CompilerC__.CompilerSteps
 
         private Node Prefixe()
         {
-            if (Check("-"))
+            if (Check("minus"))
             {
                 Node node = Prefixe();
                 return node;
             }
-            else if (Check("+"))
+            else if (Check("plus"))
             {
                 Node node = Prefixe();
                 return node;
             }
-            else if (Check("!"))
+            else if (Check("exclamation"))
             {
                 Node node = Prefixe();
                 return node;
@@ -107,16 +107,22 @@ namespace CompilerC__.CompilerSteps
 
         private Node Atome()
         {
-            if (Check("("))
+            if (Check("parenthesisIn"))
             {
                 Node node = Expression();
-                Accept(")");
+                Accept("parenthesisOut");
                 return node;
             }
             else if (Check("const"))
             {
                 Token token = LexicalScanner.Last;
-                Node node = new(token, true);
+                Node node = new(token, withValue: true);
+                return node;
+            }
+            else if (Check("ident"))
+            {
+                Token token = LexicalScanner.Last;
+                Node node = new (token, withValue: true);
                 return node;
             }
             else
@@ -132,21 +138,19 @@ namespace CompilerC__.CompilerSteps
             Node arg1 = Prefixe();
             int i = 0;
             DataRow row;
+            Operation? op;
 
             // to transform as in dtOperation
-            while (Utils.IsInDataTable(Utils.dtOperations, columnName: "token", value: LexicalScanner.Current.Type))
-            {
-                row = Utils.dtOperations.Select($"token = '{LexicalScanner.Current.Type}'")[0];
-                string op = (string)row["token"];
-                int prio = (int)row["prio"];
 
-                if (prio >= pmin)
+            while ((op = Utils.GetOperation(LexicalScanner?.Current?.Type)) != null)
+            {
+                if (op.Priority >= pmin)
                 {
                     LexicalScanner.NextToken();
 
-                    Node arg2 = Execute(prio + ((bool)row["isLeftAsso"] ? 1 : 0));
+                    Node arg2 = Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0));
 
-                    arg1 = new Node(Utils.GetNodeType(op).Code, arg1, arg2);
+                    arg1 = new Node(op.NodeType.Code, arg1, arg2);
                 }
                 else
                     break;

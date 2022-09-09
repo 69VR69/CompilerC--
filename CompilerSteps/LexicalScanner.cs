@@ -81,7 +81,7 @@ namespace CompilerC__.CompilerSteps
         private string FormatLine(string fileLine) // TODO : complete
         {
             foreach (var t in Utils.tokenTypes)
-                fileLine = t.ReplaceInCharacters(fileLine);
+                fileLine = t.AddSpaceAround(fileLine);
 
             return fileLine;
             //.Replace(";", " ; ")

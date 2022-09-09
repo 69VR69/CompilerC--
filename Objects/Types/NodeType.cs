@@ -10,15 +10,9 @@ namespace CompilerC__.Objects.Types
     {
         public string Code { get; set; }
 
-        public string[] AssemblyInstructions
-        {
-            get; set;
-        }
-
-        public NodeType(string code, params string[] assemblyInstructions)
+        public NodeType(string code)
         {
             Code = code;
-            AssemblyInstructions = assemblyInstructions;
         }
     }
 }

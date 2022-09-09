@@ -10,7 +10,7 @@ namespace CompilerC__.Objects
 {
     internal class Operation
     {
-        public string TokenType { get; set; }
+        public TokenType TokenType { get; set; }
 
         public int Priority { get; set; }
 
@@ -18,7 +18,7 @@ namespace CompilerC__.Objects
 
         public NodeType? NodeType { get; set; }
 
-        public Operation(string tokenType,int priority = 0, bool isleftAssociate = true, NodeType? nodeType = null)
+        public Operation(TokenType tokenType,int priority = 0, bool isleftAssociate = true, NodeType? nodeType = null)
         {
             TokenType = tokenType;
             Priority = priority;

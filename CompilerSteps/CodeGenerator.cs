@@ -28,10 +28,10 @@ namespace CompilerC__.CompilerSteps
 
         public void GenerateCode()
         {
+            Node node = SemanticScanner.SeS();
+            
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(".start");
-
-            Node node = SemanticScanner.SeS();
 
             sb = GenerateNodeCode(node, sb);
 

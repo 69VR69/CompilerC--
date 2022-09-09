@@ -42,7 +42,7 @@ namespace CompilerC__.Objects.Types
             return false;
         }
 
-        public string ReplaceInCharacters(string s)
+        public string AddSpaceAround(string s)
         {
             if (MatchedCharacters != null && MatchedCharacters.Count > 0)
             {

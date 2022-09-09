@@ -68,34 +68,34 @@ namespace CompilerC__
         {
             new TokenType("eos", regex: "eos" ),
             new TokenType("const", regex: "\\d" ),
-            new TokenType("var", regex: "" ), // TODO
+            new TokenType("ident", regex: "\\w" ), // TODO
             new TokenType("space", ' ','\t'),
             new TokenType("newLine", '\n','\r'),
             new TokenType("main", regex:"main"),
             new TokenType("preproc", '#'),
             new TokenType("comment", regex: "\\/\\/.*"),
-            new TokenType("(", '('),
-            new TokenType(")",')'),
-            new TokenType("{", '{'),
-            new TokenType("}", '}'),
-            new TokenType(";", ';'),
-            new TokenType("+", '+'),
-            new TokenType(code: "-", '-'),
-            new TokenType("*", '*'),
-            new TokenType("/", '/'),
-            new TokenType("%", '%'),
-            new TokenType("&",'&'),
-            new TokenType("&&",regex:"&&"),
-            new TokenType("=", '='),
-            new TokenType("==", regex:"=="),
-            new TokenType(",", ','),
-            new TokenType("!",'!'),
-            new TokenType("!=", regex:"!="),
-            new TokenType("<", '<'),
-            new TokenType("<=", regex:"<="),
-            new TokenType(">",'>'),
-            new TokenType(">=",regex:">="),
-            new TokenType("||", regex:"\\|\\|"),
+            new TokenType("parenthesisIn", '('),
+            new TokenType("parenthesisOut",')'),
+            new TokenType("bracketIn", '{'),
+            new TokenType("bracketOut", '}'),
+            new TokenType("semicolon", ';'),
+            new TokenType("plus", '+'),
+            new TokenType("minus", '-'),
+            new TokenType("star", '*'),
+            new TokenType("slash", '/'),
+            new TokenType("percent", '%'),
+            new TokenType("ampersand",'&'),
+            new TokenType("ampersandDouble",regex:"&&"),
+            new TokenType("equal", '='),
+            new TokenType("equalDouble", regex:"=="),
+            new TokenType("comma", ','),
+            new TokenType("exclamation",'!'),
+            new TokenType("exclamationEqual", regex:"!="),
+            new TokenType("lowChevron", '<'),
+            new TokenType("lowChevronEqual", regex:"<="),
+            new TokenType("upChevron",'>'),
+            new TokenType("upChevronEqual",regex:">="),
+            new TokenType("pipeDouble", regex:"\\|\\|"),
             new TokenType("return", regex: "return" ),
             new TokenType("int", regex: "int" ),
             new TokenType("if", regex: "if" ),
@@ -107,9 +107,6 @@ namespace CompilerC__
             new TokenType("continue",regex: "continue" ),
         };
 
-        
-        #region Methods
-
         public static TokenType? GetTokenType(string code)
         {
             return tokenTypes.Find(t => t.Code == code);
@@ -119,15 +116,37 @@ namespace CompilerC__
             return tokenTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
         }
 
-        #endregion Methods
-
         #endregion Token Management
 
         #region Nodes
 
         public static List<NodeType> nodeTypes = new()
         {
-            new NodeType("const",""),
+            new ("const"),
+            new ("mult"),
+            new ("div"),
+            new ("mod"),
+            new ("add"),
+            new ("sub"),
+            new ("less"),
+            new ("lessequal"),
+            new ("more"),
+            new ("moreequal"),
+            new ("equal"),
+            new ("notequal"),
+            new ("and"),
+            new ("or"),
+            new ("assign"),
+            new ("loop"),
+            new ("cond"),
+            new ("seq"),
+            new ("block"),
+            new ("."),
+            new ("."),
+            new ("."),
+            new ("."),
+            new ("."),
+            new ("."),
         };
 
         public static NodeType? GetNodeType(string code)
@@ -144,28 +163,35 @@ namespace CompilerC__
         #region Operators
         public static List<Operation> operations = new()
         {
-            new ("*", 6, true, GetNodeType("mult")),
-            new ("/", 6, true, GetNodeType("div")),
-            new ( "+", 5, true, GetNodeType("add")),
-            new ("-", 5, true, GetNodeType("sub")),
-            new ("<", 4, true, GetNodeType("less") ),
-            new ( "<=", 4, true, GetNodeType("lessequal")),
-            new ( ">", 4, true, GetNodeType("more")),
-            new ( ">=", 4, true, GetNodeType("moreequal")),
-            new ( "==", 4, true, GetNodeType("equal")),
-            new ( "!=", 4, true, GetNodeType("notequal")),
-            new ( "&&", 3, true, GetNodeType("and")),
-            new (  "||", 2, true, GetNodeType("or")),
-            new ( "=", 1, false, GetNodeType("assign")),
+            new (GetTokenType("star"), 6, true, GetNodeType("mult")),
+            new (GetTokenType("slash"), 6, true, GetNodeType("div")),
+            new (GetTokenType("percent"), 6, true, GetNodeType("mod")),
+            new (GetTokenType("plus"), 5, true, GetNodeType("add")),
+            new (GetTokenType("minus"), 5, true, GetNodeType("sub")),
+            new (GetTokenType("lowChevron"), 4, true, GetNodeType("less") ),
+            new (GetTokenType("lowChevronEqual"), 4, true, GetNodeType("lessequal")),
+            new (GetTokenType("upChevron"), 4, true, GetNodeType("more")),
+            new (GetTokenType("upChevronEqual"), 4, true, GetNodeType("moreequal")),
+            new (GetTokenType("equalDouble"), 4, true, GetNodeType("equal")),
+            new (GetTokenType("exclamationEqual"), 4, true, GetNodeType("notequal")),
+            new (GetTokenType("ampersandDouble"), 3, true, GetNodeType("and")),
+            new (GetTokenType("pipeDouble"), 2, true, GetNodeType("or")),
+            new (GetTokenType("equal"), 1, false, GetNodeType("assign")),
         };
 
         public static Operation? GetOperation(string tokenType)
         {
-            return operations.Find(t => t.TokenType == tokenType);
+            if (tokenType == null)
+                return null;
+            else
+                return operations.Find(t => t.TokenType.Code == tokenType);
         }
         public static Operation[]? GetOperation(params string[] tokenType)
         {
-            return operations.Where(t => tokenType.Contains(t.TokenType)).Select(t => t).ToArray();
+            if (tokenType == null)
+                return null;
+            else
+                return operations.Where(t => tokenType.Contains(t.TokenType.Code)).OrderBy(t => t.Priority).Select(t => t).ToArray();
         }
 
         #endregion Operators
@@ -176,14 +202,14 @@ namespace CompilerC__
         {
             if (string.IsNullOrEmpty(columnName) || string.IsNullOrEmpty(value))
                 return false;
-            
+
             DataRow[]? drResult = dt.Select($"{columnName} = '{value}'");
             return drResult != null && drResult.Length > 0;
         }
 
         public static DataTable dtSymboles = new("Variables")
         {
-            Columns = { { "id", typeof(string) }, { "type", typeof(string) }, { "adresse", typeof(byte[]) }, { "blockId", typeof(int) } },
+            Columns = { { "id", typeof(string) }, { "type", typeof(string) }, { "adresse", typeof(byte[]) } },
         };
     }
 }
