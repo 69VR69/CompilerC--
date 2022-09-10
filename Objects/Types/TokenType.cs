@@ -10,18 +10,21 @@ namespace CompilerC__.Objects.Types
     internal class TokenType
     {
         public string Code { get; set; }
+        public int Order { get; set; }
         public List<char>? MatchedCharacters { get; set; }
         public Regex? Regex { get; set; }
 
-        public TokenType(string code, string regex)
+        public TokenType(string code, int order = 0, string regex = "")
         {
             Code = code;
+            Order = order;
             Regex = new Regex($"^{regex}$");
         }
-
-        public TokenType(string code, params char[] matchedCharacters)
+        
+        public TokenType(string code, int order = 0, params char[] matchedCharacters)
         {
             Code = code;
+            Order = order;
             MatchedCharacters = matchedCharacters.ToList();
         }
 

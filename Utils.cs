@@ -18,7 +18,7 @@ namespace CompilerC__
         public static bool debugMode = false;
         public static List<CompilerException> exceptions = new List<CompilerException>
         {
-            new CompilerException("unknow_error","An unknowed exception was trown, error message : {0}"),
+            new CompilerException("unknow_error","An exception was trown, error message : {0}"),
             new CompilerException("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug>"),
             new CompilerException("invalid_file_extension","Invalid file extension, file path provide : {0}"),
             new CompilerException("file_not_exist","File doesn't exist, file path provide : {0}"),
@@ -66,45 +66,45 @@ namespace CompilerC__
 
         public static List<TokenType> tokenTypes = new()
         {
-            new TokenType("eos", regex: "eos" ),
-            new TokenType("const", regex: "\\d" ),
-            new TokenType("ident", regex: "\\w" ), // TODO
-            new TokenType("space", ' ','\t'),
-            new TokenType("newLine", '\n','\r'),
-            new TokenType("main", regex:"main"),
-            new TokenType("preproc", '#'),
-            new TokenType("comment", regex: "\\/\\/.*"),
-            new TokenType("parenthesisIn", '('),
-            new TokenType("parenthesisOut",')'),
-            new TokenType("bracketIn", '{'),
-            new TokenType("bracketOut", '}'),
-            new TokenType("semicolon", ';'),
-            new TokenType("plus", '+'),
-            new TokenType("minus", '-'),
-            new TokenType("star", '*'),
-            new TokenType("slash", '/'),
-            new TokenType("percent", '%'),
-            new TokenType("ampersand",'&'),
-            new TokenType("ampersandDouble",regex:"&&"),
-            new TokenType("equal", '='),
-            new TokenType("equalDouble", regex:"=="),
-            new TokenType("comma", ','),
-            new TokenType("exclamation",'!'),
-            new TokenType("exclamationEqual", regex:"!="),
-            new TokenType("lowChevron", '<'),
-            new TokenType("lowChevronEqual", regex:"<="),
-            new TokenType("upChevron",'>'),
-            new TokenType("upChevronEqual",regex:">="),
-            new TokenType("pipeDouble", regex:"\\|\\|"),
-            new TokenType("return", regex: "return" ),
-            new TokenType("int", regex: "int" ),
-            new TokenType("if", regex: "if" ),
-            new TokenType("else", regex: "else" ),
-            new TokenType("for",regex: "for" ),
-            new TokenType("while", regex: "while" ),
-            new TokenType("do", regex: "do" ),
-            new TokenType("break", regex: "break" ),
-            new TokenType("continue",regex: "continue" ),
+            new TokenType("eos",0, regex: "eos" ),
+            new TokenType("const", 0,regex: "\\d+" ),
+            new TokenType("ident", 5,regex: "[a-zA-Z]+" ),
+            new TokenType("space",0, ' ','\t'),
+            new TokenType("newLine", 0,'\n','\r'),
+            new TokenType("main",10, regex:"main"),
+            new TokenType("preproc",0, '#'),
+            new TokenType("comment", 5,regex: "\\/\\/.*"),
+            new TokenType("parenthesisIn",0, '('),
+            new TokenType("parenthesisOut",0,')'),
+            new TokenType("bracketIn",0, '{'),
+            new TokenType("bracketOut",0, '}'),
+            new TokenType("semicolon",0, ';'),
+            new TokenType("plus",0, '+'),
+            new TokenType("minus",0, '-'),
+            new TokenType("star",0, '*'),
+            new TokenType("slash",0, '/'),
+            new TokenType("percent",0, '%'),
+            new TokenType("ampersand",0,'&'),
+            new TokenType("ampersandDouble",5,regex:"&&"),
+            new TokenType("equal", 0,'='),
+            new TokenType("equalDouble", 5,regex:"=="),
+            new TokenType("comma", 0,','),
+            new TokenType("exclamation",0,'!'),
+            new TokenType("exclamationEqual",5, regex:"!="),
+            new TokenType("lowChevron", 0,'<'),
+            new TokenType("lowChevronEqual",5, regex:"<="),
+            new TokenType("upChevron",0,'>'),
+            new TokenType("upChevronEqual",5,regex:">="),
+            new TokenType("pipeDouble",5, regex:"\\|\\|"),
+            new TokenType("return", 10,regex: "return" ),
+            new TokenType("int", 10,regex: "int" ),
+            new TokenType("if", 10,regex: "if" ),
+            new TokenType("else",10, regex: "else" ),
+            new TokenType("for",10,regex: "for" ),
+            new TokenType("while",10, regex: "while" ),
+            new TokenType("do", 10,regex: "do" ),
+            new TokenType("break",10, regex: "break" ),
+            new TokenType("continue",10,regex: "continue" ),
         };
 
         public static TokenType? GetTokenType(string code)
@@ -122,12 +122,14 @@ namespace CompilerC__
 
         public static List<NodeType> nodeTypes = new()
         {
+            new ("var"),
             new ("const"),
             new ("mult"),
             new ("div"),
             new ("mod"),
             new ("add"),
             new ("sub"),
+            new ("not"),
             new ("less"),
             new ("lessequal"),
             new ("more"),
@@ -137,16 +139,13 @@ namespace CompilerC__
             new ("and"),
             new ("or"),
             new ("assign"),
+            new ("break"),
+            new ("continue"),
             new ("loop"),
             new ("cond"),
             new ("seq"),
+            new ("declaration"),
             new ("block"),
-            new ("."),
-            new ("."),
-            new ("."),
-            new ("."),
-            new ("."),
-            new ("."),
         };
 
         public static NodeType? GetNodeType(string code)
@@ -196,20 +195,30 @@ namespace CompilerC__
 
         #endregion Operators
 
-        #endregion Objects
-
-        public static bool IsInDataTable(DataTable dt, string columnName, string value)
+        #region Symbols
+        public static List<SymbolType> symbolTypes = new()
         {
-            if (string.IsNullOrEmpty(columnName) || string.IsNullOrEmpty(value))
-                return false;
+            new ("var"),
+            new ("func"),
+        };
 
-            DataRow[]? drResult = dt.Select($"{columnName} = '{value}'");
-            return drResult != null && drResult.Length > 0;
+        public static SymbolType? GetSymbolType(string symbolType)
+        {
+            if (symbolType == null)
+                return null;
+            else
+                return symbolTypes.Find(t => t.Code == symbolType);
+        }
+        public static SymbolType[]? GetSymbolTypen(params string[] symbolType)
+        {
+            if (symbolType == null)
+                return null;
+            else
+                return symbolTypes.Where(t => symbolType.Contains(t.Code)).Select(t => t).ToArray();
         }
 
-        public static DataTable dtSymboles = new("Variables")
-        {
-            Columns = { { "id", typeof(string) }, { "type", typeof(string) }, { "adresse", typeof(byte[]) } },
-        };
+        #endregion Operators
+
+        #endregion Objects
     }
 }

@@ -49,18 +49,33 @@ namespace CompilerC__.CompilerSteps
                 Node then = Instruction();
 
                 if (Check("else"))
-                    return new Node("cond", test, then, Instruction());
+                    return new ("cond", test, then, Instruction());
                 else
-                    return new Node("cond", test, then);
+                    return new ("cond", test, then);
             }
             else if (Check("bracketIn"))
             {
-                Node block = new Node("block");
+                Node block = new ("block");
                 while (!Check("bracketOut"))
                 {
                     block.Childs.Add(Instruction());
                 }
                 return block;
+            }
+            else if (Check("int"))
+            {
+                Node declaration = new("declaration");
+
+                do
+                {
+                    Token ident = LexicalScanner.Current;
+                    declaration.Childs.Add(new("var", ident.Value, ident.Line, ident.Column));
+                    LexicalScanner.NextToken();
+                } while (Check("comma"));
+
+
+                Accept("semicolon");
+                return declaration;
             }
             else
             {
@@ -122,7 +137,7 @@ namespace CompilerC__.CompilerSteps
             else if (Check("ident"))
             {
                 Token token = LexicalScanner.Last;
-                Node node = new (token, withValue: true);
+                Node node = new(token, withValue: true);
                 return node;
             }
             else
@@ -135,12 +150,8 @@ namespace CompilerC__.CompilerSteps
 
         private Node Execute(int pmin = 0)
         {
-            Node arg1 = Prefixe();
-            int i = 0;
-            DataRow row;
+            Node prefixNode = Prefixe();
             Operation? op;
-
-            // to transform as in dtOperation
 
             while ((op = Utils.GetOperation(LexicalScanner?.Current?.Type)) != null)
             {
@@ -148,14 +159,12 @@ namespace CompilerC__.CompilerSteps
                 {
                     LexicalScanner.NextToken();
 
-                    Node arg2 = Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0));
-
-                    arg1 = new Node(op.NodeType.Code, arg1, arg2);
+                    prefixNode = new Node(op.NodeType?.Code, prefixNode, Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0)));
                 }
                 else
                     break;
             }
-            return arg1;
+            return prefixNode;
         }
 
         private bool Check(string tokenType)

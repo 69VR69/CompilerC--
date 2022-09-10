@@ -52,7 +52,7 @@ namespace CompilerC__.CompilerSteps
             // Split the line in block of tokens
             List<string> blocks = formattedFileLine.Split(spacesDelemiter, StringSplitOptions.RemoveEmptyEntries).ToList();
 
-            List<Token>? foundToken = new List<Token>();
+            List<Token>? foundToken = new();
             foreach (string b in blocks)
             {
                 // Stop if found a ignore character
@@ -60,10 +60,10 @@ namespace CompilerC__.CompilerSteps
                     break;
 
                 // Recognize the token
-                List<TokenType> possibleTokenType = tokenTypes.Where(t => t.IsMatch(b)).ToList();
+                List<TokenType> possibleTokenType = tokenTypes.Where(t => t.IsMatch(b)).OrderByDescending(t=> t.Order).ToList();
                 if (possibleTokenType.Count > 1 && Utils.debugMode)
                     Console.WriteLine($"possybility for block \"{b}\" : \"{possibleTokenType?.Select(t => t.Code)?.Aggregate((a, b) => $"{a} {b}")}\"");
-                tokenType = possibleTokenType.Count > 0 ? possibleTokenType.First().Code : null;
+                tokenType = possibleTokenType?.Count > 0 ? possibleTokenType.First().Code : string.Empty;
 
                 if (!string.IsNullOrWhiteSpace(tokenType))
                     foundToken.Add(new Token(tokenType, tokenValue, CurrentLine, nbColumn));
@@ -78,16 +78,14 @@ namespace CompilerC__.CompilerSteps
             return foundToken;
         }
 
-        private string FormatLine(string fileLine) // TODO : complete
+        private string FormatLine(string fileLine) // TODO : fix composition of token bug (ex : / and //)
         {
-            foreach (var t in Utils.tokenTypes)
+            List<TokenType>? temp = Utils.tokenTypes.OrderByDescending(t => t.Order).ToList();
+
+            foreach (var t in temp)
                 fileLine = t.AddSpaceAround(fileLine);
 
             return fileLine;
-            //.Replace(";", " ; ")
-            //.Replace("(", " ( ")
-            //.Replace(")", " ) ")
-            //.Replace("#", " # ");
         }
         public Token NextToken()
         {
@@ -115,7 +113,7 @@ namespace CompilerC__.CompilerSteps
         public void Accept(TokenType type)
         {
             if (!Check(type))
-                Utils.PrintError("");
+                Utils.PrintError("unrecognized_tokentype",false,type.Code);
         }
     }
 }

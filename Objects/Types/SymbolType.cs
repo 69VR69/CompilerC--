@@ -8,5 +8,11 @@ namespace CompilerC__.Objects.Types
 {
     internal class SymbolType
     {
+        public string Code { get; set; }
+        
+        public SymbolType(string code)
+        {
+            Code = code;
+        }
     }
 }
