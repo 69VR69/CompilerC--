@@ -14,6 +14,7 @@ namespace CompilerC__.Objects
 
         public string Type { get; set; }
         public int? Value { get; set; }
+        public int? Address { get; set; }
         public int Line { get; set; }
         public int Column { get; set; }
         public List<Node> Childs { get; set; }

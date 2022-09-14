@@ -14,9 +14,9 @@ namespace CompilerC__.Objects
 
         public int Ident { get; set; }
 
-        public byte[] Address { get; set; }
-
-        public Symbol(SymbolType type, int ident, byte[] address)
+        public int Address { get; set; }
+        
+        public Symbol(SymbolType type, int ident, int address)
         {
             Type = type;
             Ident = ident;

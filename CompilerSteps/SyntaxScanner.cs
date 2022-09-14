@@ -49,13 +49,13 @@ namespace CompilerC__.CompilerSteps
                 Node then = Instruction();
 
                 if (Check("else"))
-                    return new ("cond", test, then, Instruction());
+                    return new("cond", test, then, Instruction());
                 else
-                    return new ("cond", test, then);
+                    return new("cond", test, then);
             }
             else if (Check("bracketIn"))
             {
-                Node block = new ("block");
+                Node block = new("block");
                 while (!Check("bracketOut"))
                 {
                     block.Childs.Add(Instruction());
@@ -73,9 +73,52 @@ namespace CompilerC__.CompilerSteps
                     LexicalScanner.NextToken();
                 } while (Check("comma"));
 
-
                 Accept("semicolon");
                 return declaration;
+            }
+            else if(Check("break"))
+            {
+                Accept("semicolon");
+                return new("break");
+            }
+            else if(Check("continue"))
+            {
+                Accept("semicolon");
+                return new("continue");
+            }
+            else if (Check("while"))
+            {
+                Accept("parenthesisIn");
+                Node test = Expression();
+                Accept("parenthesisOut");
+                Node then = Instruction();
+
+                return new("loop", new Node("continue"), new Node("cond", test, then, new Node("break")));
+            }
+            else if (Check("do"))
+            {
+                Node i = Instruction();
+
+                Accept("while");
+                Accept("parenthesisIn");
+                Node test = Expression();
+                Accept("parenthesisOut");
+                Accept("semicolon");
+
+                return new Node("loop", new Node("continue"), i, new Node("cond", new Node("not", test), new Node("break")));
+            }
+            else if (Check("for"))
+            {
+                Accept("parenthesisIn");
+                Node init = Expression();
+                Accept("semicolon");
+                Node test = Expression();
+                Accept("semicolon");
+                Node step = Expression();
+                Accept("parenthesisOut");
+                Node then = Instruction();
+
+                return new Node("seq", init, new Node("cond", then, new Node("continue"), step, new Node("not", test)), new Node("break"));
             }
             else
             {

@@ -13,6 +13,8 @@ namespace CompilerC__
 {
     internal static class Utils
     {
+        public static int nbVar = 0;
+
         #region Exception Management
 
         public static bool debugMode = false;
