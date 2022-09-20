@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 using CompilerC__.Objects;
+using CompilerC__.Objects.Types;
 
 namespace CompilerC__.CompilerSteps
 {
@@ -47,7 +49,7 @@ namespace CompilerC__.CompilerSteps
                     if (n.Value == null)
                         Utils.PrintError("var_without_ident", arg: n.Value);
 
-                    n.Address = SearchSymbol((int)n.Value).Address; // check type
+                    n.Address = SearchSymbol((int)n.Value, Utils.GetSymbolType("var")).Address;
                     break;
 
                 case "assign":
@@ -64,34 +66,47 @@ namespace CompilerC__.CompilerSteps
                         if (c.Value == null)
                             Utils.PrintError("var_without_ident", arg: c.Value);
 
-                        Symbol s = Declare((int)c.Value);
-
-                        s.Type = Utils.GetSymbolType("var");
-                        s.Address = Utils.nbVar;
-                        Utils.nbVar++;
+                        Declare((int)c.Value, Utils.GetSymbolType("var"));
                     }
                     break;
             }
         }
 
-        private Symbol Declare(int value)
+        private Symbol Declare(int ident, SymbolType type)
         {
-            throw new NotImplementedException();
+            HashSet<Symbol> lastTable = SymbolTable.Last();
+
+            if (lastTable.Any(s => s.Ident == ident))
+                Utils.PrintError("symbol_already_declared", arg: ident);
+
+            lastTable.Add(new(type, ident, Utils.nbVar));
+            Utils.nbVar++;
+
+            return SymbolTable.Last<HashSet<Symbol>>().Last<Symbol>();
         }
 
-        private Symbol SearchSymbol(int ident)
+        private Symbol SearchSymbol(int ident, SymbolType type)
         {
-            throw new NotImplementedException();
+            foreach (HashSet<Symbol> table in SymbolTable)
+            {
+                Symbol? symbol = table.FirstOrDefault(s => s.Ident == ident && s.Type == type);
+
+                if (symbol != null)
+                    return symbol;
+            }
+
+            Utils.PrintError("unrecognized_symbol", true, ident);
+            return null;
         }
 
         private void EndBlock()
         {
-            throw new NotImplementedException();
+            SymbolTable.Pop();
         }
 
         private void StartBlock()
         {
-            throw new NotImplementedException();
+            SymbolTable.Push(new HashSet<Symbol>());
         }
     }
 }
