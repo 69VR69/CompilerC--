@@ -93,7 +93,17 @@ namespace CompilerC__.Objects
             Column = column;
             Childs = childs.ToList();
         }
-       
+
         #endregion Constructors
+
+        public override string ToString()
+        {
+            string str = $"\t{Type}({Value})->\n";
+            foreach (Node child in Childs)
+            {
+                str += $"\t{child}\n";
+            }
+            return $"{str}";
+        }
     }
 }

@@ -20,42 +20,97 @@ namespace CompilerC__.CompilerSteps
             get; set;
         }
 
+        private int NbLbl { get; set; }
+        private int LblBreak { get; set; }
+
         public CodeGenerator()
         {
             SemanticScanner = new SemanticScanner();
             GeneratedCode = string.Empty;
+            NbLbl = 0;
+            LblBreak = NbLbl;
         }
 
         public void GenerateCode()
         {
             Node node = SemanticScanner.SeS();
-            
-            StringBuilder sb = new StringBuilder();
+            Console.WriteLine($"Tree node generated : \n{node}");
+
+
+            Console.WriteLine("Code Generation start !");
+
+            StringBuilder sb = new();
             sb.AppendLine(".start");
+            sb.AppendLine($"resn {Utils.nbVar}");
 
             sb = GenerateNodeCode(node, sb);
 
-            sb.AppendLine("\tdebug")
-                .AppendLine("\thalt");
+            sb.AppendLine("debug")
+                .AppendLine("halt");
 
             GeneratedCode = sb.ToString();
+
+            Console.WriteLine("Code Generation end !");
+
 
             Console.WriteLine($"Generated assembly code :\n{GeneratedCode}");
             //CreateFileFromString();
         }
 
-        private StringBuilder GenerateNodeCode(Node root, StringBuilder sb) // TODO : to complete with specials cases
+        private StringBuilder GenerateNodeCode(Node root, StringBuilder sb)
         {
-            if (root.Type == "const")
+            switch (root.Type)
             {
-                sb.AppendLine($"push {root.Value}");
-                return sb;
+                case "const":
+                    sb.AppendLine($"push {root.Value}");
+                    break;
+
+                case "ident":
+                    sb.AppendLine($"get {root.Address}");
+                    break;
+
+                case "declaration":
+                    break;
+
+                case "assign":
+                    GenerateNodeCode(root.Childs[1], sb);
+                    sb.AppendLine($"dup");
+                    sb.AppendLine($"set {root.Childs[1].Address}");
+                    break;
+
+                case "break":
+                    sb.AppendLine($"jump l{LblBreak}");
+                    break;
+
+                case "loop":
+                    int temp = LblBreak;
+                    LblBreak = ++NbLbl;
+                    int lbl_1 = ++NbLbl;
+
+                    sb.AppendLine($".l{lbl_1}");
+
+                    foreach (var c in root.Childs)
+                        GenerateNodeCode(c, sb);
+
+                    sb.AppendLine($"jump l{lbl_1} ");
+                    sb.AppendLine($".l{LblBreak}");
+                    LblBreak = temp;
+                    break;
+
+                case "continue":
+                    int lbl_continue = ++NbLbl;
+                    sb.AppendLine(".l" + lbl_continue);
+                    break;
+
+                default:
+                    foreach (Node child in root.Childs)
+                        sb = GenerateNodeCode(child, sb);
+
+                    sb.AppendLine(root.Type);
+                    break;
+
             }
 
-            foreach (Node child in root.Childs)
-                sb = GenerateNodeCode(child, sb);
-
-            sb.AppendLine(root.Type);
 
             return sb;
         }

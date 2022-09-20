@@ -25,12 +25,19 @@ namespace CompilerC__.CompilerSteps
         // General
         public Node SS()
         {
+            
+            Console.WriteLine("Syntax scanning start !");
+            
             Accept("int");
             Accept("main");
             Accept("parenthesisIn");
             Accept("parenthesisOut");
             Node node = Function();
             Accept("eos");
+            
+            Console.WriteLine("Syntax scanning start !");
+            
+            
             return node;
         }
 

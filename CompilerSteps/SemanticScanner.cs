@@ -25,7 +25,15 @@ namespace CompilerC__.CompilerSteps
         {
             Node n = SyntaxScanner.SS();
             Utils.nbVar = 0;
+            
+
+            Console.WriteLine("Semantic scanning start !");
+            
             SemNode(n);
+            
+            Console.WriteLine("Semantic scanning end !");
+
+            
             return n;
         }
 

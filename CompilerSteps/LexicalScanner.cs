@@ -32,46 +32,60 @@ namespace CompilerC__.CompilerSteps
 
         private List<Token> Next()
         {
-            if (CurrentLine >= FileLines.Count)
-                return new List<Token> { new Token(Utils.tokenTypes.Where(t => t.Code == "eos").Select(t => t).ToArray()[0].Code, 0, 0, 0) };
-
-            string fileLine = FileLines[CurrentLine];
-            CurrentLine++;
-            string tokenType = string.Empty;
-            int tokenValue = 0;
-            int nbColumn = 0;
-
-            if (Utils.debugMode)
-            {
-                Console.WriteLine($"initial line : {fileLine}");
-            }
-
-            // Reformat the line
-            string formattedFileLine = FormatLine(fileLine);
-
-            // Split the line in block of tokens
-            List<string> blocks = formattedFileLine.Split(spacesDelemiter, StringSplitOptions.RemoveEmptyEntries).ToList();
-
             List<Token>? foundToken = new();
-            foreach (string b in blocks)
+
+            if (CurrentLine >= FileLines.Count)
             {
-                // Stop if found a ignore character
-                if (ignored.Any(i => i.IsMatch(b)))
-                    break;
+                foundToken = new List<Token> { new Token(Utils.tokenTypes.Where(t => t.Code == "eos").Select(t => t).ToArray()[0].Code, 0, 0, 0) };
+            }
+            else
+            {
+                string fileLine = FileLines[CurrentLine];
+                CurrentLine++;
+                string tokenType = string.Empty;
+                int tokenValue = 0;
+                int nbColumn = 0;
 
-                // Recognize the token
-                List<TokenType> possibleTokenType = tokenTypes.Where(t => t.IsMatch(b)).OrderByDescending(t=> t.Order).ToList();
-                if (possibleTokenType.Count > 1 && Utils.debugMode)
-                    Console.WriteLine($"possybility for block \"{b}\" : \"{possibleTokenType?.Select(t => t.Code)?.Aggregate((a, b) => $"{a} {b}")}\"");
-                tokenType = possibleTokenType?.Count > 0 ? possibleTokenType.First().Code : string.Empty;
+                if (Utils.debugMode)
+                    Console.WriteLine($"initial line : {fileLine}");
 
-                if (!string.IsNullOrWhiteSpace(tokenType))
-                    foundToken.Add(new Token(tokenType, tokenValue, CurrentLine, nbColumn));
+                // Reformat the line
+                string formattedFileLine = FormatLine(fileLine);
+
+                // Split the line in block of tokens
+                List<string> blocks = formattedFileLine.Split(spacesDelemiter, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                foreach (string b in blocks)
+                {
+                    // Stop if found a ignore character
+                    if (ignored.Any(i => i.IsMatch(b)))
+                        break;
+
+                    // Recognize the token
+                    List<TokenType> possibleTokenType = tokenTypes.Where(t => t.IsMatch(b)).OrderByDescending(t => t.Order).ToList();
+                    if (possibleTokenType.Count > 1 && Utils.debugMode)
+                        Console.WriteLine($"possybility for block \"{b}\" : \"{possibleTokenType?.Select(t => t.Code)?.Aggregate((a, b) => $"{a} {b}")}\"");
+                    tokenType = possibleTokenType?.Count > 0 ? possibleTokenType.First().Code : string.Empty;
+
+                    switch (tokenType)
+                    {
+                        case "const":
+                            tokenValue = int.Parse(b);
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(tokenType))
+                        foundToken.Add(new Token(tokenType, tokenValue, CurrentLine, nbColumn));
+                }
             }
 
-            if (foundToken != null && foundToken.Count > 0 && Utils.debugMode)
+            if (foundToken != null && foundToken.Count > 0)
             {
-                Console.WriteLine($"token found : {foundToken.Select(t => t.Type).Aggregate((a, b) => $"{a} {b}")}\n");
+                if (Utils.debugMode)
+                    Console.WriteLine($"token found : {foundToken.Select(t => t.Type).Aggregate((a, b) => $"{a} {b}")}\n");
                 TokenBuffer.AddRange(foundToken);
             }
 
@@ -113,7 +127,7 @@ namespace CompilerC__.CompilerSteps
         public void Accept(TokenType type)
         {
             if (!Check(type))
-                Utils.PrintError("unrecognized_tokentype",false,type.Code);
+                Utils.PrintError("unrecognized_tokentype", false, type.Code);
         }
     }
 }
