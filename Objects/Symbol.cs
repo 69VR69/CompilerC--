@@ -12,11 +12,11 @@ namespace CompilerC__.Objects
     {
         public SymbolType Type { get; set; }
 
-        public int Ident { get; set; }
+        public string Ident { get; set; }
 
         public int Address { get; set; }
         
-        public Symbol(SymbolType type, int ident, int address)
+        public Symbol(SymbolType type, string ident, int address)
         {
             Type = type;
             Ident = ident;

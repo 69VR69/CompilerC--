@@ -31,6 +31,9 @@ namespace CompilerC__
             new CompilerException("unrecognized_tokentype","Unrecognized token type '{0}'"),
             new CompilerException("no_element_group","No element group provide for grammar group '{0}'"),
             new CompilerException("unrecognized_token","Unrecognized token '{0}' at ({1},{2})"),
+            new CompilerException("symbol_already_declared","A symbol with the identification code '{0}' is already declared in this scope"),
+            new CompilerException("assign_to_non_var","Assignation to {0} is impossible as it's not a variable"),
+            new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
         };
 
         public static void PrintError(string exceptionCode, bool isBlocking = false, object? arg = null)
@@ -47,10 +50,17 @@ namespace CompilerC__
             CompilerException? ex = exceptions.Where(e => e.Code == exceptionCode).FirstOrDefault();
             string? message = ex?.Message;
             if (string.IsNullOrWhiteSpace(message))
-                message = "Unknown exception raised";
+            {
+                if (string.IsNullOrEmpty(exceptionCode))
+                    message = "Unknown exception raised";
+                else
+                    message = $"Message missing for thrown exception code : {exceptionCode}";
+            }
             else if (args != null)
+            {
                 for (int i = 0; i < args.Length; i++)
                     message = message.Replace($"{{{i}}}", args[i].ToString());
+            }
 
             // Print or raise exception
             if (isBlocking)

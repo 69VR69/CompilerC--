@@ -26,7 +26,7 @@ namespace CompilerC__.CompilerSteps
             FileLines = null;
             CurrentLine = 0;
             TokenBuffer = new List<Token>();
-            Current = new Token("eos", 0, 0, 0);
+            Current = new Token("eos",string.Empty);
             Last = Current;
         }
 
@@ -36,14 +36,13 @@ namespace CompilerC__.CompilerSteps
 
             if (CurrentLine >= FileLines.Count)
             {
-                foundToken = new List<Token> { new Token(Utils.tokenTypes.Where(t => t.Code == "eos").Select(t => t).ToArray()[0].Code, 0, 0, 0) };
+                foundToken = new List<Token> { new Token(Utils.tokenTypes.Where(t => t.Code == "eos").Select(t => t).ToArray()[0].Code,string.Empty) };
             }
             else
             {
                 string fileLine = FileLines[CurrentLine];
                 CurrentLine++;
                 string tokenType = string.Empty;
-                int tokenValue = 0;
                 int nbColumn = 0;
 
                 if (Utils.debugMode)
@@ -67,10 +66,12 @@ namespace CompilerC__.CompilerSteps
                         Console.WriteLine($"possybility for block \"{b}\" : \"{possibleTokenType?.Select(t => t.Code)?.Aggregate((a, b) => $"{a} {b}")}\"");
                     tokenType = possibleTokenType?.Count > 0 ? possibleTokenType.First().Code : string.Empty;
 
+                    string tokenValue = string.Empty;
                     switch (tokenType)
                     {
-                        case "const":
-                            tokenValue = int.Parse(b);
+                        case "const":                            
+                        case "ident":
+                            tokenValue = b;
                             break;
 
                         default:

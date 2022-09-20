@@ -13,7 +13,7 @@ namespace CompilerC__.Objects
         #region Properties
 
         public string Type { get; set; }
-        public int? Value { get; set; }
+        public string Value { get; set; }
         public int? Address { get; set; }
         public int Line { get; set; }
         public int Column { get; set; }
@@ -26,7 +26,7 @@ namespace CompilerC__.Objects
         public Node()
         {
             Type = string.Empty;
-            Value = null;
+            Value = string.Empty;
             Line = 0;
             Column = 0;
             Childs = new List<Node>();
@@ -34,7 +34,7 @@ namespace CompilerC__.Objects
         public Node(Token token, bool withValue = false)
         {
             Type = token.Type;
-            Value = withValue? token.Value : null;
+            Value = withValue? token.Value : string.Empty;
             Line = token.Line;
             Column = token.Column;
             Childs = new List<Node>();
@@ -43,7 +43,7 @@ namespace CompilerC__.Objects
         public Node(params Node[] childs)
         {
             Type = string.Empty;
-            Value = null;
+            Value = string.Empty;
             Line = 0;
             Column = 0;
             Childs = childs.ToList();
@@ -52,7 +52,7 @@ namespace CompilerC__.Objects
         public Node(string type,params Node[] childs)
         {
             Type = type;
-            Value = null;
+            Value = string.Empty;
             Line = 0;
             Column = 0;
             Childs = childs.ToList();
@@ -61,13 +61,13 @@ namespace CompilerC__.Objects
         public Node(string type, int line, int column)
         {
             Type = type;
-            Value = null;
+            Value = string.Empty;
             Line = line;
             Column = column;
             Childs = new List<Node>();
         }
 
-        public Node(string type, int value, int line, int column)
+        public Node(string type, string value, int line, int column)
         {
             Type = type;
             Value = value;
@@ -79,13 +79,13 @@ namespace CompilerC__.Objects
         public Node(string type, int line, int column, params Node[] childs)
         {
             Type = type;
-            Value = null;
+            Value = string.Empty;
             Line = line;
             Column = column;
             Childs = childs.ToList();
         }
 
-        public Node(string type, int value, int line, int column, params Node[] childs)
+        public Node(string type, string value, int line, int column, params Node[] childs)
         {
             Type = type;
             Value = value;

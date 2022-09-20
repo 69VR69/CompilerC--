@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 using CompilerC__.Objects;
 
@@ -34,10 +30,10 @@ namespace CompilerC__.CompilerSteps
         public void GenerateCode()
         {
             Node node = SemanticScanner.SeS();
-            Console.WriteLine($"Tree node generated : \n{node}");
+            if (Utils.debugMode)
+                Console.WriteLine($"Tree node generated : \n{node}\n");
 
-
-            Console.WriteLine("Code Generation start !");
+            Console.WriteLine("\n\nCode Generation start !\n");
 
             StringBuilder sb = new();
             sb.AppendLine(".start");
@@ -50,16 +46,16 @@ namespace CompilerC__.CompilerSteps
 
             GeneratedCode = sb.ToString();
 
-            Console.WriteLine("Code Generation end !");
+            Console.WriteLine("\nCode Generation end !\n\n");
 
-
-            Console.WriteLine($"Generated assembly code :\n{GeneratedCode}");
+            if (Utils.debugMode)
+                Console.WriteLine($"Generated assembly code :\n{GeneratedCode}");
             //CreateFileFromString();
         }
 
         private StringBuilder GenerateNodeCode(Node root, StringBuilder sb)
         {
-            switch (root.Type)
+            switch (root.Type) //block ?
             {
                 case "const":
                     sb.AppendLine($"push {root.Value}");
@@ -75,7 +71,7 @@ namespace CompilerC__.CompilerSteps
                 case "assign":
                     GenerateNodeCode(root.Childs[1], sb);
                     sb.AppendLine($"dup");
-                    sb.AppendLine($"set {root.Childs[1].Address}");
+                    sb.AppendLine($"set {root.Childs[0].Address}");
                     break;
 
                 case "break":

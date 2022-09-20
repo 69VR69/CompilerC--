@@ -27,11 +27,11 @@ namespace CompilerC__.CompilerSteps
             Utils.nbVar = 0;
             
 
-            Console.WriteLine("Semantic scanning start !");
+            Console.WriteLine("\n\nSemantic scanning start !\n");
             
             SemNode(n);
             
-            Console.WriteLine("Semantic scanning end !");
+            Console.WriteLine("\nSemantic scanning end !\n\n");
 
             
             return n;
@@ -53,16 +53,16 @@ namespace CompilerC__.CompilerSteps
                     EndBlock();
                     break;
 
-                case "var":
+                case "ident":
                     if (n.Value == null)
                         Utils.PrintError("var_without_ident", arg: n.Value);
 
-                    n.Address = SearchSymbol((int)n.Value, Utils.GetSymbolType("var")).Address;
+                    n.Address = SearchSymbol(n.Value, Utils.GetSymbolType("var")).Address;
                     break;
 
                 case "assign":
-                    if (n.Childs[0].Type != "var")
-                        Utils.PrintError("assign_to_non_var", arg: n.Childs[0].Value);
+                    if (n.Childs[0].Type != "ident")
+                        Utils.PrintError("assign_to_non_var", arg: n.Childs[0].Type);
                     else
                         foreach (Node c in n.Childs)
                             SemNode(c);
@@ -74,13 +74,13 @@ namespace CompilerC__.CompilerSteps
                         if (c.Value == null)
                             Utils.PrintError("var_without_ident", arg: c.Value);
 
-                        Declare((int)c.Value, Utils.GetSymbolType("var"));
+                        Declare(c.Value, Utils.GetSymbolType("var"));
                     }
                     break;
             }
         }
 
-        private Symbol Declare(int ident, SymbolType type)
+        private Symbol Declare(string ident, SymbolType type)
         {
             HashSet<Symbol> lastTable = SymbolTable.Last();
 
@@ -93,7 +93,7 @@ namespace CompilerC__.CompilerSteps
             return SymbolTable.Last<HashSet<Symbol>>().Last<Symbol>();
         }
 
-        private Symbol SearchSymbol(int ident, SymbolType type)
+        private Symbol SearchSymbol(string ident, SymbolType type)
         {
             foreach (HashSet<Symbol> table in SymbolTable)
             {

@@ -26,7 +26,7 @@ namespace CompilerC__.CompilerSteps
         public Node SS()
         {
             
-            Console.WriteLine("Syntax scanning start !");
+            Console.WriteLine("\n\nSyntax scanning start !\n");
             
             Accept("int");
             Accept("main");
@@ -35,7 +35,7 @@ namespace CompilerC__.CompilerSteps
             Node node = Function();
             Accept("eos");
             
-            Console.WriteLine("Syntax scanning start !");
+            Console.WriteLine("\n\nSyntax scanning start !\n");
             
             
             return node;
