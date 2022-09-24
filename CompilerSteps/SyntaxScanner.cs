@@ -100,7 +100,7 @@ namespace CompilerC__.CompilerSteps
                 Accept("parenthesisOut");
                 Node then = Instruction();
 
-                return new("loop", new Node("continue"), new Node("cond", test, then, new Node("break")));
+                return new("loop", new Node("continueLabel"), new Node("cond", test, then, new Node("break")));
             }
             else if (Check("do"))
             {
@@ -112,7 +112,7 @@ namespace CompilerC__.CompilerSteps
                 Accept("parenthesisOut");
                 Accept("semicolon");
 
-                return new Node("loop", new Node("continue"), i, new Node("cond", new Node("not", test), new Node("break")));
+                return new Node("loop", new Node("continueLabel"), i, new Node("cond", new Node("not", test), new Node("break")));
             }
             else if (Check("for"))
             {
@@ -125,7 +125,7 @@ namespace CompilerC__.CompilerSteps
                 Accept("parenthesisOut");
                 Node then = Instruction();
 
-                return new Node("seq", init, new Node("cond", then, new Node("continue"), step, new Node("not", test)), new Node("break"));
+                return new Node("seq", init, new Node("cond", then, new Node("continueLabel"), step, new Node("not", test)), new Node("break"));
             }
             else
             {

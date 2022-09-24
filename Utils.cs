@@ -153,6 +153,7 @@ namespace CompilerC__
             new ("assign"),
             new ("break"),
             new ("continue"),
+            new ("continueLabel"),
             new ("loop"),
             new ("cond"),
             new ("seq"),

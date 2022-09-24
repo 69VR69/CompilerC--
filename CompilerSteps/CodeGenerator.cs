@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Text.RegularExpressions;
 
 using CompilerC__.Objects;
 
@@ -15,16 +16,30 @@ namespace CompilerC__.CompilerSteps
         {
             get; set;
         }
-
-        private int NbLbl { get; set; }
-        private int LblBreak { get; set; }
+        private static Dictionary<string, int> LabelCounter { get; set; }
+        private static Dictionary<string, string> Labels { get; set; }
 
         public CodeGenerator()
         {
             SemanticScanner = new SemanticScanner();
             GeneratedCode = string.Empty;
-            NbLbl = 0;
-            LblBreak = NbLbl;
+            Labels = new()
+            {
+                {"break","lb" },
+                {"loop","ll" },
+                {"continue","lc" },
+                {"if","li" },
+                {"then","lt" },
+                {"else","le" },
+            };
+            LabelCounter = new()
+            {
+                {"break",0 },
+                {"loop",0 },
+                {"continue",0 },
+                {"if",0 },
+                {"else",0 },
+            };
         }
 
         public void GenerateCode()
@@ -41,7 +56,7 @@ namespace CompilerC__.CompilerSteps
 
             sb = GenerateNodeCode(node, sb);
 
-            sb.AppendLine("debug")
+            sb.AppendLine("\ndebug")
                 .AppendLine("halt");
 
             GeneratedCode = sb.ToString();
@@ -57,6 +72,10 @@ namespace CompilerC__.CompilerSteps
         {
             switch (root.Type) //block ?
             {
+                case "declaration":
+                case "seq":
+                    break;
+
                 case "const":
                     sb.AppendLine($"push {root.Value}");
                     break;
@@ -65,43 +84,108 @@ namespace CompilerC__.CompilerSteps
                     sb.AppendLine($"get {root.Address}");
                     break;
 
-                case "declaration":
-                    break;
-
                 case "assign":
                     GenerateNodeCode(root.Childs[1], sb);
                     sb.AppendLine($"dup");
                     sb.AppendLine($"set {root.Childs[0].Address}");
                     break;
 
+                ////////////////////////////////////////////////////////////////
+
+                case "cond":
+                    string ifLabel = GetNewLabel("if");
+                    string elseLabel = GetNewLabel("else");
+
+                    sb.AppendLine($"\t; start of cond n°{LabelCounter["if"]}");
+
+                    GenerateNodeCode(root.Childs[0], sb); //condition
+
+                    sb.AppendLine($"jumpf {elseLabel}");
+
+                    GenerateNodeCode(root.Childs[1], sb); //then
+
+                    sb.AppendLine($"jump {ifLabel}");
+                    sb.AppendLine($".{elseLabel}");
+
+                    if (root.Childs.Count == 3)
+                        GenerateNodeCode(root.Childs[2], sb); //else
+
+                    sb.AppendLine($".{ifLabel}");
+
+                    sb.AppendLine($"\t; end of cond n°{LabelCounter["if"]}");
+
+                    break;
+
+                case "more":
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine("cmpgt");
+                    break;
+
+                case "less":
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine("cmplt");
+                    break;
+
+                case "moreequal":
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine("cmpge");
+                    break;
+
+                case "lessequal":
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine("cmple");
+                    break;
+
+                case "equal":
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine("cmpeq");
+                    break;
+
+                case "notequal":
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine("cmpne");
+                    break;
+
+                ////////////////////////////////////////////////////////////////
+
                 case "break":
-                    sb.AppendLine($"jump l{LblBreak}");
+                    sb.AppendLine($"jump {GetLabel("break")}");
                     break;
 
                 case "loop":
-                    int temp = LblBreak;
-                    LblBreak = ++NbLbl;
-                    int lbl_1 = ++NbLbl;
+                    string tempLblbBreak = GetNewLabel("break", post: true);
+                    string looplabel = GetNewLabel("loop");
 
-                    sb.AppendLine($".l{lbl_1}");
+                    sb.AppendLine($"\t; start of loop n°{LabelCounter["loop"]}");
 
-                    foreach (var c in root.Childs)
-                        GenerateNodeCode(c, sb);
+                    sb.AppendLine($".{looplabel}");
 
-                    sb.AppendLine($"jump l{lbl_1} ");
-                    sb.AppendLine($".l{LblBreak}");
-                    LblBreak = temp;
+                    GenerateCodeForChilds(root, sb);
+
+                    sb.AppendLine($"jump {looplabel} ");
+                    sb.AppendLine($".lb{LabelCounter["break"]}");
+
+
+                    sb.AppendLine($"\t; end of loop n°{LabelCounter["loop"]}");
+
+                    SetLabelCounter(tempLblbBreak);
                     break;
 
                 case "continue":
-                    int lbl_continue = ++NbLbl;
-                    sb.AppendLine(".l" + lbl_continue);
+                    sb.AppendLine($"jump {GetLabel("continue")}");
+                    break;
+
+                case "continueLabel":
+                    sb.AppendLine($".{GetNewLabel("continue")}");
+                    break;
+
+                ////////////////////////////////////////////////////////////////
+                case "block":
+                    GenerateCodeForChilds(root, sb);
                     break;
 
                 default:
-                    foreach (Node child in root.Childs)
-                        sb = GenerateNodeCode(child, sb);
-
+                    GenerateCodeForChilds(root, sb);
                     sb.AppendLine(root.Type);
                     break;
 
@@ -129,6 +213,25 @@ namespace CompilerC__.CompilerSteps
             LexicalScanner lexicalScanner = SemanticScanner.SyntaxScanner.LexicalScanner;
             lexicalScanner.FileLines = fileLines;
             lexicalScanner.NextToken();
+        }
+
+        private void GenerateCodeForChilds(Node root, StringBuilder sb)
+        {
+            foreach (Node child in root.Childs)
+                GenerateNodeCode(child, sb);
+        }
+
+        private string GetLabel(string label)
+        {
+            return Labels[label] + LabelCounter[label];
+        }
+        private string GetNewLabel(string label, bool post = false)
+        {
+            return Labels[label] + (post ? LabelCounter[label]++ : ++LabelCounter[label]);
+        }
+        private void SetLabelCounter(string label)
+        {
+            LabelCounter[Labels.FirstOrDefault(x => x.Value == Regex.Match(label, @"\D+").Value).Key] = int.Parse(Regex.Match(label, @"\d+").Value);
         }
     }
 }
