@@ -25,19 +25,19 @@ namespace CompilerC__.CompilerSteps
         // General
         public Node SS()
         {
-            
+
             Console.WriteLine("\n\nSyntax scanning start !\n");
-            
+
             Accept("int");
             Accept("main");
             Accept("parenthesisIn");
             Accept("parenthesisOut");
             Node node = Function();
             Accept("eos");
-            
+
             Console.WriteLine("\n\nSyntax scanning start !\n");
-            
-            
+
+
             return node;
         }
 
@@ -83,12 +83,12 @@ namespace CompilerC__.CompilerSteps
                 Accept("semicolon");
                 return declaration;
             }
-            else if(Check("break"))
+            else if (Check("break"))
             {
                 Accept("semicolon");
                 return new("break");
             }
-            else if(Check("continue"))
+            else if (Check("continue"))
             {
                 Accept("semicolon");
                 return new("continue");
@@ -205,15 +205,13 @@ namespace CompilerC__.CompilerSteps
 
             while ((op = Utils.GetOperation(LexicalScanner?.Current?.Type)) != null)
             {
-                if (op.Priority >= pmin)
-                {
-                    LexicalScanner.NextToken();
-
-                    prefixNode = new Node(op.NodeType?.Code, prefixNode, Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0)));
-                }
-                else
+                if (op.Priority < pmin)
                     break;
+                
+                LexicalScanner.NextToken();
+                prefixNode = new Node(op.NodeType?.Code, prefixNode, Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0)));
             }
+            
             return prefixNode;
         }
 
