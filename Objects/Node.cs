@@ -16,7 +16,6 @@ namespace CompilerC__.Objects
         public string Value { get; set; }
         public int? Address { get; set; }
         public int Line { get; set; }
-        public int Column { get; set; }
         public List<Node> Childs { get; set; }
 
         #endregion Properties
@@ -28,7 +27,6 @@ namespace CompilerC__.Objects
             Type = string.Empty;
             Value = string.Empty;
             Line = 0;
-            Column = 0;
             Childs = new List<Node>();
         }
         public Node(Token token, bool withValue = false)
@@ -36,7 +34,6 @@ namespace CompilerC__.Objects
             Type = token.Type;
             Value = withValue? token.Value : string.Empty;
             Line = token.Line;
-            Column = token.Column;
             Childs = new List<Node>();
         }
         
@@ -45,7 +42,6 @@ namespace CompilerC__.Objects
             Type = string.Empty;
             Value = string.Empty;
             Line = 0;
-            Column = 0;
             Childs = childs.ToList();
         }
         
@@ -54,43 +50,38 @@ namespace CompilerC__.Objects
             Type = type;
             Value = string.Empty;
             Line = 0;
-            Column = 0;
             Childs = childs.ToList();
         }
 
-        public Node(string type, int line, int column)
+        public Node(string type, int line)
         {
             Type = type;
             Value = string.Empty;
             Line = line;
-            Column = column;
             Childs = new List<Node>();
         }
 
-        public Node(string type, string value, int line, int column)
+        public Node(string type, string value, int line)
         {
             Type = type;
             Value = value;
             Line = line;
-            Column = column;
             Childs = new List<Node>();
         }
 
-        public Node(string type, int line, int column, params Node[] childs)
+        public Node(string type, int line, params Node[] childs)
         {
             Type = type;
             Value = string.Empty;
             Line = line;
-            Column = column;
             Childs = childs.ToList();
         }
 
-        public Node(string type, string value, int line, int column, params Node[] childs)
+        public Node(string type, string value, int line, params Node[] childs)
         {
             Type = type;
             Value = value;
             Line = line;
-            Column = column;
             Childs = childs.ToList();
         }
 

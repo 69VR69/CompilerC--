@@ -76,7 +76,7 @@ namespace CompilerC__.CompilerSteps
                 do
                 {
                     Token ident = LexicalScanner.Current;
-                    declaration.Childs.Add(new("var", ident.Value, ident.Line, ident.Column));
+                    declaration.Childs.Add(new("var", ident.Value, ident.Line));
                     LexicalScanner.NextToken();
                 } while (Check("comma"));
 
@@ -193,7 +193,7 @@ namespace CompilerC__.CompilerSteps
             else
             {
                 Token token = LexicalScanner.Current;
-                Utils.PrintError("unrecognized_token", true, token.Type, token.Line, token.Column);
+                Utils.PrintError("unrecognized_token", true, token.Type, token.Line);
                 return null;
             }
         }

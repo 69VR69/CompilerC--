@@ -14,5 +14,10 @@ namespace CompilerC__.Objects.Types
         {
             Code = code;
         }
+
+        public override string ToString()
+        {
+            return $"{Code}";
+        }
     }
 }

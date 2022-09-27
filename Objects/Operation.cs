@@ -25,5 +25,12 @@ namespace CompilerC__.Objects
             IsLeftAssociate = isleftAssociate;
             NodeType = nodeType;
         }
+
+
+
+        public override string ToString()
+        {
+            return $"{TokenType}";
+        }
     }
 }

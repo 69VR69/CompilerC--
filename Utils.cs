@@ -30,7 +30,7 @@ namespace CompilerC__
             new CompilerException("unrecognized_grammargroup","Unrecognized grammar group '{0}'"),
             new CompilerException("unrecognized_tokentype","Unrecognized token type '{0}'"),
             new CompilerException("no_element_group","No element group provide for grammar group '{0}'"),
-            new CompilerException("unrecognized_token","Unrecognized token '{0}' at ({1},{2})"),
+            new CompilerException("unrecognized_token","Unrecognized token '{0}' at line {1}"),
             new CompilerException("symbol_already_declared","A symbol with the identification code '{0}' is already declared in this scope"),
             new CompilerException("assign_to_non_var","Assignation to {0} is impossible as it's not a variable"),
             new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
@@ -74,7 +74,7 @@ namespace CompilerC__
 
         #region Objects
 
-        #region Token Management
+        #region Token
 
         public static List<TokenType> tokenTypes = new()
         {
@@ -85,7 +85,6 @@ namespace CompilerC__
             new TokenType("newLine", 0,'\n','\r'),
             new TokenType("main",10, regex:"main"),
             new TokenType("preproc",0, '#'),
-            new TokenType("comment", 5,regex: "\\/\\/.*"),
             new TokenType("parenthesisIn",0, '('),
             new TokenType("parenthesisOut",0,')'),
             new TokenType("bracketIn",0, '{'),
@@ -97,17 +96,12 @@ namespace CompilerC__
             new TokenType("slash",0, '/'),
             new TokenType("percent",0, '%'),
             new TokenType("ampersand",0,'&'),
-            new TokenType("ampersandDouble",5,regex:"&&"),
+            new TokenType("pipe",0,'|'),
             new TokenType("equal", 0,'='),
-            new TokenType("equalDouble", 5,regex:"=="),
             new TokenType("comma", 0,','),
             new TokenType("exclamation",0,'!'),
-            new TokenType("exclamationEqual",5, regex:"!="),
             new TokenType("lowChevron", 0,'<'),
-            new TokenType("lowChevronEqual",5, regex:"<="),
             new TokenType("upChevron",0,'>'),
-            new TokenType("upChevronEqual",5,regex:">="),
-            new TokenType("pipeDouble",5, regex:"\\|\\|"),
             new TokenType("return", 10,regex: "return" ),
             new TokenType("int", 10,regex: "int" ),
             new TokenType("if", 10,regex: "if" ),
@@ -119,6 +113,19 @@ namespace CompilerC__
             new TokenType("continue",10,regex: "continue" ),
         };
 
+        public static void AddComposedTokenTypes()
+        {
+            tokenTypes.AddRange(new List<TokenType>()
+            {
+                new ComposedTokenType("comment", 5, GetTokenType("slash"), GetTokenType("slash")),
+                new ComposedTokenType("ampersandDouble", 5, GetTokenType("ampersand"), GetTokenType("ampersand")),
+                new ComposedTokenType("equalDouble", 5, GetTokenType("equal"), GetTokenType("equal")),
+                new ComposedTokenType("exclamationEqual", 5, GetTokenType("exclamation"), GetTokenType("equal")),
+                new ComposedTokenType("lowChevronEqual", 5, GetTokenType("lowChevron"), GetTokenType("equal")),
+                new ComposedTokenType("upChevronEqual", 5, GetTokenType("upChevron"), GetTokenType("equal")),
+                new ComposedTokenType("pipeDouble", 5, GetTokenType("pipe"), GetTokenType("pipe")),
+            });
+        }
         public static TokenType? GetTokenType(string code)
         {
             return tokenTypes.Find(t => t.Code == code);
@@ -128,7 +135,7 @@ namespace CompilerC__
             return tokenTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
         }
 
-        #endregion Token Management
+        #endregion Token
 
         #region Nodes
 
@@ -196,14 +203,14 @@ namespace CompilerC__
             if (tokenType == null)
                 return null;
             else
-                return operations.Find(t => t.TokenType.Code == tokenType);
+                return operations.Find(o => o.TokenType.Code == tokenType);
         }
         public static Operation[]? GetOperation(params string[] tokenType)
         {
             if (tokenType == null)
                 return null;
             else
-                return operations.Where(t => tokenType.Contains(t.TokenType.Code)).OrderBy(t => t.Priority).Select(t => t).ToArray();
+                return operations.Where(o => tokenType.Contains(o.TokenType.Code)).OrderBy(o => o.Priority).Select(o => o).ToArray();
         }
 
         #endregion Operators
@@ -222,7 +229,7 @@ namespace CompilerC__
             else
                 return symbolTypes.Find(t => t.Code == symbolType);
         }
-        public static SymbolType[]? GetSymbolTypen(params string[] symbolType)
+        public static SymbolType[]? GetSymbolType(params string[] symbolType)
         {
             if (symbolType == null)
                 return null;

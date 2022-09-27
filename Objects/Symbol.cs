@@ -22,5 +22,10 @@ namespace CompilerC__.Objects
             Ident = ident;
             Address = address;
         }
+
+        public override string ToString()
+        {
+            return $"{Type}";
+        }
     }
 }

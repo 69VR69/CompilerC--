@@ -7,6 +7,9 @@ namespace CompilerC__
 
         static void Main(string[] args)
         {
+            // Init Utils
+            Utils.AddComposedTokenTypes();
+
             try
             {
                 #region Parse arguments
