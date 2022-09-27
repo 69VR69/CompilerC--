@@ -1,6 +1,6 @@
 ﻿#include <stdio.h>
 int main() {
-	1;
+	1+3;
 	// This is a comment
-	2;
+	2+3;
 }

@@ -22,18 +22,25 @@ namespace CompilerC__
         {
             new CompilerException("unknow_error","An exception was trown, error message : {0}"),
             new CompilerException("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug>"),
+            
+            // File exceptions
             new CompilerException("invalid_file_extension","Invalid file extension, file path provide : {0}"),
             new CompilerException("file_not_exist","File doesn't exist, file path provide : {0}"),
             new CompilerException("file_read_error","A file read error occurs, error message : {0}"),
             new CompilerException("file_empty","The file is empty, file path provide : {0}"),
-            new CompilerException("unrecognized_element","Unrecognized element '{0}'"),
-            new CompilerException("unrecognized_grammargroup","Unrecognized grammar group '{0}'"),
-            new CompilerException("unrecognized_tokentype","Unrecognized token type '{0}'"),
-            new CompilerException("no_element_group","No element group provide for grammar group '{0}'"),
+            
+            // Lexical or Syntax exceptions
+            new CompilerException("unrecognized_tokentype","One or more unrecognized token type: '{0}'"),
+            new CompilerException("unrecognized_nodetype","One or more unrecognized node type: '{0}'"),
+            new CompilerException("unrecognized_nodetype","One or more unrecognized node type: '{0}'"),
+            new CompilerException("unrecognized_symboltype","One or more unrecognized symbol type: '{0}'"),
+            new CompilerException("unrecognized_operation","One or more unrecognized operation: '{0}'"),
             new CompilerException("unrecognized_token","Unrecognized token '{0}' at line {1}"),
+            
+            // Semantic exceptions
+            new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
             new CompilerException("symbol_already_declared","A symbol with the identification code '{0}' is already declared in this scope"),
             new CompilerException("assign_to_non_var","Assignation to {0} is impossible as it's not a variable"),
-            new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
         };
 
         public static void PrintError(string exceptionCode, bool isBlocking = false, object? arg = null)
@@ -112,7 +119,6 @@ namespace CompilerC__
             new TokenType("break",10, regex: "break" ),
             new TokenType("continue",10,regex: "continue" ),
         };
-
         public static void AddComposedTokenTypes()
         {
             tokenTypes.AddRange(new List<TokenType>()
@@ -126,13 +132,24 @@ namespace CompilerC__
                 new ComposedTokenType("pipeDouble", 5, GetTokenType("pipe"), GetTokenType("pipe")),
             });
         }
-        public static TokenType? GetTokenType(string code)
+
+        public static TokenType GetTokenType(string code)
         {
-            return tokenTypes.Find(t => t.Code == code);
+            TokenType? t = tokenTypes.Find(t => t.Code == code);
+
+            if (t == null)
+                Utils.PrintError("unrecognized_tokentype", true, code);
+
+            return t;
         }
-        public static TokenType[]? GetTokenType(params string[] code)
+        public static TokenType[] GetTokenType(params string[] code)
         {
-            return tokenTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
+            TokenType[]? t = tokenTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
+
+            if (t == null)
+                Utils.PrintError("unrecognized_tokentype", true, code);
+
+            return t;
         }
 
         #endregion Token
@@ -168,18 +185,28 @@ namespace CompilerC__
             new ("block"),
         };
 
-        public static NodeType? GetNodeType(string code)
+        public static NodeType GetNodeType(string code)
         {
-            return nodeTypes.Find(t => t.Code == code);
+            NodeType? n = nodeTypes.Find(t => t.Code == code);
+
+            if (n == null)
+                Utils.PrintError("unrecognized_nodetype", true, code);
+
+            return n;
         }
-        public static NodeType[]? GetNodeType(params string[] code)
+        public static NodeType[] GetNodeType(params string[] code)
         {
-            return nodeTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
+            NodeType[]? n = nodeTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
+
+            if (n == null)
+                Utils.PrintError("unrecognized_nodetype", true, code);
+
+            return n;
         }
 
         #endregion Nodes
 
-        #region Operators
+        #region Operation
         public static List<Operation> operations = new()
         {
             new (GetTokenType("star"), 6, true, GetNodeType("mult")),
@@ -198,22 +225,26 @@ namespace CompilerC__
             new (GetTokenType("equal"), 1, false, GetNodeType("assign")),
         };
 
-        public static Operation? GetOperation(string tokenType)
+        public static Operation GetOperation(string tokenType)
         {
-            if (tokenType == null)
-                return null;
-            else
-                return operations.Find(o => o.TokenType.Code == tokenType);
+            Operation? o = operations.Find(o => o.TokenType.Code == tokenType);
+
+            if (o == null)
+                Utils.PrintError("unrecognized_operation", true, tokenType);
+
+            return o;
         }
-        public static Operation[]? GetOperation(params string[] tokenType)
+        public static Operation[] GetOperation(params string[] tokenType)
         {
-            if (tokenType == null)
-                return null;
-            else
-                return operations.Where(o => tokenType.Contains(o.TokenType.Code)).OrderBy(o => o.Priority).Select(o => o).ToArray();
+            Operation[]? o = operations.Where(o => tokenType.Contains(o.TokenType.Code)).OrderBy(o => o.Priority).Select(o => o).ToArray();
+
+            if (o == null)
+                Utils.PrintError("unrecognized_operation", true, tokenType);
+
+            return o;
         }
 
-        #endregion Operators
+        #endregion Operation
 
         #region Symbols
         public static List<SymbolType> symbolTypes = new()
@@ -222,19 +253,24 @@ namespace CompilerC__
             new ("func"),
         };
 
-        public static SymbolType? GetSymbolType(string symbolType)
+        public static SymbolType GetSymbolType(string symbolType)
         {
-            if (symbolType == null)
-                return null;
-            else
-                return symbolTypes.Find(t => t.Code == symbolType);
+            SymbolType? s = symbolTypes.Find(t => t.Code == symbolType);
+
+            if (s == null)
+                Utils.PrintError("unrecognized_symboltype", true, symbolType);
+
+            return s;
         }
-        public static SymbolType[]? GetSymbolType(params string[] symbolType)
+        public static SymbolType[] GetSymbolType(params string[] symbolType)
         {
-            if (symbolType == null)
-                return null;
-            else
-                return symbolTypes.Where(t => symbolType.Contains(t.Code)).Select(t => t).ToArray();
+
+            SymbolType[]? s = symbolTypes.Where(t => symbolType.Contains(t.Code)).Select(t => t).ToArray();
+            
+            if (s == null)
+                Utils.PrintError("unrecognized_symboltype", true, symbolType);
+
+            return s;
         }
 
         #endregion Operators
