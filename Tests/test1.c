@@ -1,6 +1,6 @@
 ﻿#include <stdio.h>
 
-int test()
+int a()
 {
 	int b;
 	b = 2 + 1;
@@ -15,10 +15,10 @@ int test()
 }
 
 int main() {
-	int a;
-	a = 5;
+	int u;
 
-	test();
+	a();
+	//a = 5;
 
 	int i;
 	for (i=0; i < 7; i=i+1)

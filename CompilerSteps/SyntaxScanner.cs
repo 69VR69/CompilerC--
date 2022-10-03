@@ -1,4 +1,6 @@
-﻿using CompilerC__.Objects;
+﻿using System.Xml.Linq;
+
+using CompilerC__.Objects;
 
 namespace CompilerC__.CompilerSteps
 {
@@ -28,17 +30,33 @@ namespace CompilerC__.CompilerSteps
         {
             if (Check("int"))
             {
+                Node declaration = new Node();
+
                 Token identToken = LexicalScanner.Current;
                 string ident = identToken.Value;
                 int line = identToken.Line;
                 LexicalScanner.NextToken();
 
                 Accept("parenthesisIn");
+                if (Check("int"))
+                {
+                    declaration = new Node("declaration");
+                    Token temp;
+                    temp = LexicalScanner.Current;
+                    declaration.Childs.Add(new(temp, withValue: true));
+
+                    while (Check("comma"))
+                    {
+                        Accept("int");
+                        temp = LexicalScanner.Current;
+                        declaration.Childs.Add(new(temp, withValue: true));
+                    }
+                }
                 Accept("parenthesisOut");
 
                 Node instr = Instruction();
 
-                return new Node("function", value: ident, line, new Node(), instr);
+                return new Node("function", value: ident, line, declaration, instr);
             }
             else
                 return Instruction();
@@ -193,9 +211,23 @@ namespace CompilerC__.CompilerSteps
                 Token token = LexicalScanner.Last;
                 if (Check("parenthesisIn"))
                 {
-                    Node node = new("call", token.Value, token.Line);
-                    Accept("parenthesisOut");
-                    return node;
+
+                    if (Check("parenthesisOut"))
+                        return new("call", token.Value, token.Line);
+                    else
+                    {
+                        Node declaration = new("declaration", Expression());
+
+                        while (Check("comma"))
+                            declaration.Childs.Add(Expression());
+
+                        Accept("parenthesisOut");
+
+                        return new("call", token.Value, token.Line)
+                        {
+                            Childs = declaration.Childs
+                        };
+                    }
                 }
                 else
                     return new(token, withValue: true);

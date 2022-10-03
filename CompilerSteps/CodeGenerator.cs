@@ -200,7 +200,9 @@ namespace CompilerC__.CompilerSteps
 
                 case "call":
                     sb.AppendLine($"prep {root.Value}");
-                    sb.AppendLine($"call 0");
+                    int nbParams = root.Childs.Count;
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine($"call {nbParams}");
                     break;
 
                 case "return":

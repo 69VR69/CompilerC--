@@ -14,8 +14,8 @@ namespace CompilerC__.Objects
 
         public string Ident { get; set; }
 
-        public int Address { get; set; }
-        
+        public int Address { get; set; } // maybe nbVar in case of functions
+
         public Symbol(SymbolType type, string ident, int address)
         {
             Type = type;

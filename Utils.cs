@@ -40,8 +40,10 @@ namespace CompilerC__
             // Semantic exceptions
             new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
             new CompilerException("symbol_already_declared","A symbol with the identification code '{0}' is already declared in this scope"),
-            new CompilerException("assign_to_non_var","Assignation to {0} is impossible as it's not a variable"),
-            new CompilerException("function_already_exist","Function {0} already declared !"),
+            new CompilerException("assign_to_non_var","Assignation to '{0}' is impossible as it's not a variable"),
+            new CompilerException("function_already_exist","Function '{0}' already declared"),
+            new CompilerException("function_not_found","Function '{0}' not found"),
+            new CompilerException("wrong_number_of_parameters","Wrong number of parameters provide to function named '{0}'"),
         };
 
         public static void PrintError(string exceptionCode, bool isBlocking = false, object? arg = null)

@@ -19,6 +19,7 @@ namespace CompilerC__.CompilerSteps
         {
             SyntaxScanner = new SyntaxScanner();
             SymbolTable = new Stack<HashSet<Symbol>>();
+            SymbolTable.Push(new HashSet<Symbol>());
         }
 
         public Node SeS()
@@ -30,7 +31,9 @@ namespace CompilerC__.CompilerSteps
             Console.WriteLine("\n\nSemantic scanning start !\n");
 
             SemNode(n);
-            n.Address = Utils.nbVar;
+
+            // function node contain the number of variables in the function sub by number of parameters
+            n.Address = Utils.nbVar - n.Childs[0].Childs.Count;
 
             Console.WriteLine("\nSemantic scanning end !\n\n");
 
@@ -48,9 +51,10 @@ namespace CompilerC__.CompilerSteps
                     break;
 
                 case "function":
-                    StartBlock();
 
-                    Symbol s = Declare(n.Value, Utils.GetSymbolType("func"));
+                    Symbol s = Declare(n, Utils.GetSymbolType("func"));
+
+                    StartBlock();
 
                     if (s == null)
                         Utils.PrintError("function_already_exist", true, n.Value);
@@ -59,6 +63,17 @@ namespace CompilerC__.CompilerSteps
                         SemNode(c);
 
                     EndBlock();
+                    break;
+
+                case "call":
+                    s = SearchSymbol(n.Value, Utils.GetSymbolType("func"));
+
+                    if (s == null)
+                        Utils.PrintError("function_not_found", true, n.Value);
+                    Console.WriteLine("function " + n.Value + " found, expected " + s.Address);
+                    if (s.Address != n.Childs.Count)
+                        Utils.PrintError("wrong_number_of_parameters", true, n.Value);
+
                     break;
 
                 case "block":
@@ -89,15 +104,16 @@ namespace CompilerC__.CompilerSteps
                         if (c.Value == null)
                             Utils.PrintError("var_without_ident", arg: c.Value);
 
-                        Declare(c.Value, Utils.GetSymbolType("var"));
+                        Declare(c, Utils.GetSymbolType("var"));
                     }
                     break;
             }
         }
 
-        private Symbol Declare(string ident, SymbolType type)
+        private Symbol Declare(Node node, SymbolType type)
         {
             HashSet<Symbol> lastTable = SymbolTable.Last();
+            string ident = node.Value;
 
             if (lastTable.Any(s => s.Ident == ident))
                 Utils.PrintError("symbol_already_declared", arg: ident);
@@ -106,8 +122,8 @@ namespace CompilerC__.CompilerSteps
                 lastTable.Add(new(type, ident, Utils.nbVar));
                 Utils.nbVar++;
             }
-            else
-                lastTable.Add(new(type, ident));
+            else if (type == Utils.GetSymbolType("func"))
+                lastTable.Add(new(type, ident, node.Address ?? -1));
 
             return SymbolTable.Last<HashSet<Symbol>>().Last<Symbol>();
         }
@@ -126,14 +142,7 @@ namespace CompilerC__.CompilerSteps
             return null;
         }
 
-        private void StartBlock()
-        {
-            SymbolTable.Push(new HashSet<Symbol>());
-        }
-        private void EndBlock()
-        {
-            SymbolTable.Pop();
-        }
-
+        private void StartBlock() => SymbolTable.Push(new HashSet<Symbol>());
+        private void EndBlock() => SymbolTable.Pop();
     }
 }
