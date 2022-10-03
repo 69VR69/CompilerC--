@@ -207,23 +207,28 @@ namespace CompilerC__
         #endregion Nodes
 
         #region Operation
-        public static List<Operation> operations = new()
+        public static List<Operation> operations = new();
+
+        public static void AddOperation()
         {
-            new (GetTokenType("star"), 6, true, GetNodeType("mult")),
-            new (GetTokenType("slash"), 6, true, GetNodeType("div")),
-            new (GetTokenType("percent"), 6, true, GetNodeType("mod")),
-            new (GetTokenType("plus"), 5, true, GetNodeType("add")),
-            new (GetTokenType("minus"), 5, true, GetNodeType("sub")),
-            new (GetTokenType("lowChevron"), 4, true, GetNodeType("less") ),
-            new (GetTokenType("lowChevronEqual"), 4, true, GetNodeType("lessequal")),
-            new (GetTokenType("upChevron"), 4, true, GetNodeType("more")),
-            new (GetTokenType("upChevronEqual"), 4, true, GetNodeType("moreequal")),
-            new (GetTokenType("equalDouble"), 4, true, GetNodeType("equal")),
-            new (GetTokenType("exclamationEqual"), 4, true, GetNodeType("notequal")),
-            new (GetTokenType("ampersandDouble"), 3, true, GetNodeType("and")),
-            new (GetTokenType("pipeDouble"), 2, true, GetNodeType("or")),
-            new (GetTokenType("equal"), 1, false, GetNodeType("assign")),
-        };
+            operations.AddRange(new List<Operation>()
+            {
+                new(GetTokenType("star"), 6, true, GetNodeType("mult")),
+                new(GetTokenType("slash"), 6, true, GetNodeType("div")),
+                new(GetTokenType("percent"), 6, true, GetNodeType("mod")),
+                new(GetTokenType("plus"), 5, true, GetNodeType("add")),
+                new(GetTokenType("minus"), 5, true, GetNodeType("sub")),
+                new(GetTokenType("lowChevron"), 4, true, GetNodeType("less")),
+                new(GetTokenType("lowChevronEqual"), 4, true, GetNodeType("lessequal")),
+                new(GetTokenType("upChevron"), 4, true, GetNodeType("more")),
+                new(GetTokenType("upChevronEqual"), 4, true, GetNodeType("moreequal")),
+                new(GetTokenType("equalDouble"), 4, true, GetNodeType("equal")),
+                new(GetTokenType("exclamationEqual"), 4, true, GetNodeType("notequal")),
+                new(GetTokenType("ampersandDouble"), 3, true, GetNodeType("and")),
+                new(GetTokenType("pipeDouble"), 2, true, GetNodeType("or")),
+                new(GetTokenType("equal"), 1, false, GetNodeType("assign")),
+            });
+        }
 
         public static Operation GetOperation(string tokenType)
         {
@@ -266,7 +271,7 @@ namespace CompilerC__
         {
 
             SymbolType[]? s = symbolTypes.Where(t => symbolType.Contains(t.Code)).Select(t => t).ToArray();
-            
+
             if (s == null)
                 Utils.PrintError("unrecognized_symboltype", true, symbolType);
 

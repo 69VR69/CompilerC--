@@ -43,7 +43,21 @@ namespace CompilerC__.CompilerSteps
 
         private Node Function()
         {
-            return Instruction();
+            if (Check("int"))
+            {
+                Token identToken = LexicalScanner.Current;
+                string ident = identToken.Value;
+                int line = identToken.Line;
+                
+                Accept("parenthesisIn");
+                Accept("parenthesisOut");
+
+                Node instr = Instruction();
+
+                return new Node("function", value: ident, line, instr);
+            }
+            else
+                return Instruction();
         }
 
         private Node Instruction()
@@ -127,6 +141,12 @@ namespace CompilerC__.CompilerSteps
 
                 return new Node("seq", init, new Node("cond", then, new Node("continueLabel"), step, new Node("not", test)), new Node("break"));
             }
+            else if (Check("return"))
+            {
+                Node expr = Expression();
+                Accept("semicolon");
+                return new Node("return", expr);
+            }
             else
             {
                 Node e = Expression();
@@ -207,11 +227,11 @@ namespace CompilerC__.CompilerSteps
             {
                 if (op.Priority < pmin)
                     break;
-                
+
                 LexicalScanner.NextToken();
                 prefixNode = new Node(op.NodeType?.Code, prefixNode, Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0)));
             }
-            
+
             return prefixNode;
         }
 

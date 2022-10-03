@@ -9,6 +9,7 @@ namespace CompilerC__
         {
             // Init Utils
             Utils.AddComposedTokenTypes();
+            Utils.AddOperation();
 
             try
             {
