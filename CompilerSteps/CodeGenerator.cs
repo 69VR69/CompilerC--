@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 
 using CompilerC__.Objects;
+using CompilerC__.Objects.Types;
 
 namespace CompilerC__.CompilerSteps
 {
@@ -44,19 +45,25 @@ namespace CompilerC__.CompilerSteps
 
         public void GenerateCode()
         {
-            Node node = SemanticScanner.SeS();
-            if (Utils.debugMode)
-                Console.WriteLine($"Tree node generated : \n{node}\n");
-
             Console.WriteLine("\n\nCode Generation start !\n");
-
             StringBuilder sb = new();
-            sb.AppendLine(".start");
-            sb.AppendLine($"resn {Utils.nbVar}");
 
-            sb = GenerateNodeCode(node, sb);
+            do
+            {
+                Node node = SemanticScanner.SeS();
 
-            sb.AppendLine("\ndebug")
+                if (Utils.debugMode)
+                    Console.WriteLine($"Tree node generated : \n{node}\n");
+                sb = GenerateNodeCode(node, sb);
+
+                if (node.Childs[0].Type == Utils.GetNodeType("eos").Code)
+                    break;
+
+            } while (true);
+
+            sb.AppendLine(".start")
+                .AppendLine("prep main")
+                .AppendLine("call 0")
                 .AppendLine("halt");
 
             GeneratedCode = sb.ToString();
@@ -177,6 +184,27 @@ namespace CompilerC__.CompilerSteps
 
                 case "continueLabel":
                     sb.AppendLine($".{GetNewLabel("continue")}");
+                    break;
+
+                ////////////////////////////////////////////////////////////////
+
+                case "function":
+                    sb.AppendLine($"\t; start of function {root.Value}");
+                    sb.AppendLine($".{root.Value}");
+                    sb.AppendLine($"resn {root.Childs[1].Childs.Count}"); //nbVar TODO
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine($"push 0");
+                    sb.AppendLine($"ret");
+                    break;
+
+                case "call":
+                    sb.AppendLine($"prep {root.Value}");
+                    sb.AppendLine($"call 0");
+                    break;
+
+                case "return":
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine($"ret");
                     break;
 
                 ////////////////////////////////////////////////////////////////

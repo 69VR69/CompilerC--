@@ -1,16 +1,5 @@
 ﻿using CompilerC__.Objects;
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-
-using static System.Net.Mime.MediaTypeNames;
-
 namespace CompilerC__.CompilerSteps
 {
     internal class SyntaxScanner
@@ -28,15 +17,9 @@ namespace CompilerC__.CompilerSteps
 
             Console.WriteLine("\n\nSyntax scanning start !\n");
 
-            Accept("int");
-            Accept("main");
-            Accept("parenthesisIn");
-            Accept("parenthesisOut");
             Node node = Function();
-            Accept("eos");
 
-            Console.WriteLine("\n\nSyntax scanning start !\n");
-
+            Console.WriteLine("\n\nSyntax scanning end !\n");
 
             return node;
         }
@@ -48,13 +31,14 @@ namespace CompilerC__.CompilerSteps
                 Token identToken = LexicalScanner.Current;
                 string ident = identToken.Value;
                 int line = identToken.Line;
-                
+                LexicalScanner.NextToken();
+
                 Accept("parenthesisIn");
                 Accept("parenthesisOut");
-
+                
                 Node instr = Instruction();
 
-                return new Node("function", value: ident, line, instr);
+                return new Node("function", value: ident, line,new Node(), instr);
             }
             else
                 return Instruction();
@@ -207,8 +191,18 @@ namespace CompilerC__.CompilerSteps
             else if (Check("ident"))
             {
                 Token token = LexicalScanner.Last;
-                Node node = new(token, withValue: true);
-                return node;
+                if (Check("parenthesisIn"))
+                {
+                    Node node = new("call", token.Value, token.Line);
+                    Accept("parenthesisOut");
+                    return node;
+                }
+                else
+                    return new(token, withValue: true);
+            }
+            else if(Check("eos"))
+            {
+                return new("eos");
             }
             else
             {

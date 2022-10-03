@@ -25,15 +25,16 @@ namespace CompilerC__.CompilerSteps
         {
             Node n = SyntaxScanner.SS();
             Utils.nbVar = 0;
-            
+
 
             Console.WriteLine("\n\nSemantic scanning start !\n");
-            
+
             SemNode(n);
-            
+            n.Address = Utils.nbVar;
+
             Console.WriteLine("\nSemantic scanning end !\n\n");
 
-            
+
             return n;
         }
 
@@ -44,6 +45,20 @@ namespace CompilerC__.CompilerSteps
                 default:
                     foreach (Node c in n.Childs)
                         SemNode(c);
+                    break;
+
+                case "function":
+                    StartBlock();
+                    
+                    Symbol s = Declare(n.Value, Utils.GetSymbolType("func"));
+
+                    if (s == null)
+                        Utils.PrintError("function_already_exist", true, n.Value);
+
+                    foreach (Node c in n.Childs)
+                        SemNode(c);
+
+                    EndBlock();
                     break;
 
                 case "block":
@@ -106,15 +121,15 @@ namespace CompilerC__.CompilerSteps
             Utils.PrintError("unrecognized_symbol", true, ident);
             return null;
         }
-
+        
+        private void StartBlock()
+        {
+            SymbolTable.Push(new HashSet<Symbol>());
+        }
         private void EndBlock()
         {
             SymbolTable.Pop();
         }
 
-        private void StartBlock()
-        {
-            SymbolTable.Push(new HashSet<Symbol>());
-        }
     }
 }

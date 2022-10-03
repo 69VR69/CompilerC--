@@ -14,7 +14,7 @@ namespace CompilerC__.Objects
 
         public string Type { get; set; }
         public string Value { get; set; }
-        public int? Address { get; set; }
+        public int? Address { get; set; } // maybe nbVar in case of functions
         public int Line { get; set; }
         public List<Node> Childs { get; set; }
 

@@ -41,6 +41,7 @@ namespace CompilerC__
             new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
             new CompilerException("symbol_already_declared","A symbol with the identification code '{0}' is already declared in this scope"),
             new CompilerException("assign_to_non_var","Assignation to {0} is impossible as it's not a variable"),
+            new CompilerException("function_already_exist","Function {0} already declared !"),
         };
 
         public static void PrintError(string exceptionCode, bool isBlocking = false, object? arg = null)
@@ -183,6 +184,7 @@ namespace CompilerC__
             new ("seq"),
             new ("declaration"),
             new ("block"),
+            new ("eos"),
         };
 
         public static NodeType GetNodeType(string code)
@@ -230,21 +232,15 @@ namespace CompilerC__
             });
         }
 
-        public static Operation GetOperation(string tokenType)
+        public static Operation? GetOperation(string tokenType)
         {
             Operation? o = operations.Find(o => o.TokenType.Code == tokenType);
 
-            if (o == null)
-                Utils.PrintError("unrecognized_operation", true, tokenType);
-
             return o;
         }
-        public static Operation[] GetOperation(params string[] tokenType)
+        public static Operation[]? GetOperation(params string[] tokenType)
         {
             Operation[]? o = operations.Where(o => tokenType.Contains(o.TokenType.Code)).OrderBy(o => o.Priority).Select(o => o).ToArray();
-
-            if (o == null)
-                Utils.PrintError("unrecognized_operation", true, tokenType);
 
             return o;
         }
