@@ -91,7 +91,6 @@ namespace CompilerC__
             new TokenType("ident", 5,regex: "[a-zA-Z]+" ),
             new TokenType("space",0, ' ','\t'),
             new TokenType("newLine", 0,'\n','\r'),
-            new TokenType("main",10, regex:"main"),
             new TokenType("preproc",0, '#'),
             new TokenType("parenthesisIn",0, '('),
             new TokenType("parenthesisOut",0,')'),

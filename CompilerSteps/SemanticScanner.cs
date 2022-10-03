@@ -49,7 +49,7 @@ namespace CompilerC__.CompilerSteps
 
                 case "function":
                     StartBlock();
-                    
+
                     Symbol s = Declare(n.Value, Utils.GetSymbolType("func"));
 
                     if (s == null)
@@ -101,9 +101,13 @@ namespace CompilerC__.CompilerSteps
 
             if (lastTable.Any(s => s.Ident == ident))
                 Utils.PrintError("symbol_already_declared", arg: ident);
-
-            lastTable.Add(new(type, ident, Utils.nbVar));
-            Utils.nbVar++;
+            if (type == Utils.GetSymbolType("var"))
+            {
+                lastTable.Add(new(type, ident, Utils.nbVar));
+                Utils.nbVar++;
+            }
+            else
+                lastTable.Add(new(type, ident));
 
             return SymbolTable.Last<HashSet<Symbol>>().Last<Symbol>();
         }
@@ -121,7 +125,7 @@ namespace CompilerC__.CompilerSteps
             Utils.PrintError("unrecognized_symbol", true, ident);
             return null;
         }
-        
+
         private void StartBlock()
         {
             SymbolTable.Push(new HashSet<Symbol>());

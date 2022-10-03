@@ -80,7 +80,6 @@ namespace CompilerC__.CompilerSteps
             switch (root.Type) //block ?
             {
                 case "declaration":
-                case "seq":
                     break;
 
                 case "const":
@@ -189,12 +188,14 @@ namespace CompilerC__.CompilerSteps
                 ////////////////////////////////////////////////////////////////
 
                 case "function":
-                    sb.AppendLine($"\t; start of function {root.Value}");
+                    string functionName = root.Value;
+                    sb.AppendLine($"\n\t; start of function {functionName}");
                     sb.AppendLine($".{root.Value}");
-                    sb.AppendLine($"resn {root.Childs[1].Childs.Count}"); //nbVar TODO
+                    sb.AppendLine($"resn {root.Address}");
                     GenerateCodeForChilds(root, sb);
                     sb.AppendLine($"push 0");
                     sb.AppendLine($"ret");
+                    sb.AppendLine($"\t; end of function {functionName}\n");
                     break;
 
                 case "call":
@@ -209,6 +210,7 @@ namespace CompilerC__.CompilerSteps
 
                 ////////////////////////////////////////////////////////////////
                 case "block":
+                case "seq":
                     GenerateCodeForChilds(root, sb);
                     break;
 

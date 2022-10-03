@@ -22,6 +22,12 @@ namespace CompilerC__.Objects
             Ident = ident;
             Address = address;
         }
+        public Symbol(SymbolType type, string ident)
+        {
+            Type = type;
+            Ident = ident;
+            Address = -1;
+        }
 
         public override string ToString()
         {

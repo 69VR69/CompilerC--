@@ -35,10 +35,10 @@ namespace CompilerC__.CompilerSteps
 
                 Accept("parenthesisIn");
                 Accept("parenthesisOut");
-                
+
                 Node instr = Instruction();
 
-                return new Node("function", value: ident, line,new Node(), instr);
+                return new Node("function", value: ident, line, new Node(), instr);
             }
             else
                 return Instruction();
@@ -123,7 +123,7 @@ namespace CompilerC__.CompilerSteps
                 Accept("parenthesisOut");
                 Node then = Instruction();
 
-                return new Node("seq", init, new Node("cond", then, new Node("continueLabel"), step, new Node("not", test)), new Node("break"));
+                return new Node("seq", init, new Node("loop", then, new Node("continueLabel"), step, new Node("cond", new Node("not", test), new Node("break"))));
             }
             else if (Check("return"))
             {
@@ -200,7 +200,7 @@ namespace CompilerC__.CompilerSteps
                 else
                     return new(token, withValue: true);
             }
-            else if(Check("eos"))
+            else if (Check("eos"))
             {
                 return new("eos");
             }
