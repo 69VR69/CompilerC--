@@ -212,7 +212,7 @@ namespace CompilerC__.CompilerSteps
         public void Accept(TokenType type)
         {
             if (!Check(type))
-                Utils.PrintError("unrecognized_tokentype", false, type.Code);
+                Utils.PrintError("unrecognized_tokentype", true, type.Code);
         }
     }
 }

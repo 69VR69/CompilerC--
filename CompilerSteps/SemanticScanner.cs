@@ -118,7 +118,7 @@ namespace CompilerC__.CompilerSteps
             string ident = node.Value;
 
             if (lastTable.Any(s => s.Ident == ident))
-                Utils.PrintError("symbol_already_declared", arg: ident);
+                Utils.PrintError("symbol_already_declared",true, arg: ident);
             if (type == Utils.GetSymbolType("var"))
             {
                 lastTable.Add(new(type, ident, address: Utils.nbVar));

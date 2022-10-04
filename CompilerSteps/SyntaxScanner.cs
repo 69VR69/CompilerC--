@@ -232,10 +232,6 @@ namespace CompilerC__.CompilerSteps
                 else
                     return new(token, withValue: true);
             }
-            else if (Check("eos"))
-            {
-                return new("eos");
-            }
             else
             {
                 Token token = LexicalScanner.Current;
