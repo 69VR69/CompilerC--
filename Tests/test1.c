@@ -18,7 +18,6 @@ int main() {
 	int u;
 
 	a();
-	//a = 5;
 
 	int i;
 	for (i=0; i < 7; i=i+1)

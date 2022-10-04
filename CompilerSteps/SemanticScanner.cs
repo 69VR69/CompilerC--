@@ -70,8 +70,10 @@ namespace CompilerC__.CompilerSteps
 
                     if (s == null)
                         Utils.PrintError("function_not_found", true, n.Value);
-                    Console.WriteLine("function " + n.Value + " found, expected " + s.Address);
-                    if (s.Address != n.Childs.Count)
+
+                    Console.WriteLine("function " + n + " found, expected \n" + s.NbParam);
+
+                    if (s.NbParam != n.Childs.Count)
                         Utils.PrintError("wrong_number_of_parameters", true, n.Value);
 
                     break;
@@ -119,11 +121,11 @@ namespace CompilerC__.CompilerSteps
                 Utils.PrintError("symbol_already_declared", arg: ident);
             if (type == Utils.GetSymbolType("var"))
             {
-                lastTable.Add(new(type, ident, Utils.nbVar));
+                lastTable.Add(new(type, ident, address: Utils.nbVar));
                 Utils.nbVar++;
             }
             else if (type == Utils.GetSymbolType("func"))
-                lastTable.Add(new(type, ident, node.Address ?? -1));
+                lastTable.Add(new(type, ident, nbParam: node.Childs[0].Childs.Count));
 
             return SymbolTable.Last<HashSet<Symbol>>().Last<Symbol>();
         }

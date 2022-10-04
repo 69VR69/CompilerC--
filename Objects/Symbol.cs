@@ -14,19 +14,16 @@ namespace CompilerC__.Objects
 
         public string Ident { get; set; }
 
-        public int Address { get; set; } // maybe nbVar in case of functions
+        public int Address { get; set; }
 
-        public Symbol(SymbolType type, string ident, int address)
+        public int? NbParam { get; set; }
+
+        public Symbol(SymbolType type, string ident, int address = -1, int? nbParam = null)
         {
             Type = type;
             Ident = ident;
             Address = address;
-        }
-        public Symbol(SymbolType type, string ident)
-        {
-            Type = type;
-            Ident = ident;
-            Address = -1;
+            NbParam = nbParam;
         }
 
         public override string ToString()
