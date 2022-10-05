@@ -56,7 +56,7 @@ namespace CompilerC__.CompilerSteps
                     Console.WriteLine($"Tree node generated : \n{node}\n");
                 sb = GenerateNodeCode(node, sb);
 
-                if (node.Childs[0].Type == Utils.GetNodeType("eos").Code)
+                if (GetLexicalScanner().Current.Type == Utils.GetNodeType("eos").Code)
                     break;
 
             } while (true);
@@ -240,9 +240,14 @@ namespace CompilerC__.CompilerSteps
             Console.WriteLine($"File generated at : {f.Name}");
         }
 
+        private LexicalScanner GetLexicalScanner()
+        {
+            return SemanticScanner.SyntaxScanner.LexicalScanner;
+        }
+        
         public void AddFileToLexical(List<string> fileLines)
         {
-            LexicalScanner lexicalScanner = SemanticScanner.SyntaxScanner.LexicalScanner;
+            LexicalScanner lexicalScanner = GetLexicalScanner();
             lexicalScanner.FileLines = fileLines;
             lexicalScanner.NextToken();
         }
