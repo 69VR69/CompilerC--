@@ -20,7 +20,7 @@ namespace CompilerC__.CompilerSteps
 
         private readonly char[] spacesDelemiter = Utils.tokenTypes.Where(t => t.Code == "space" && t.MatchedCharacters != null).SelectMany(t => t.MatchedCharacters).ToArray();
         private readonly TokenType[] ignored = Utils.GetTokenType("comment", "preproc");
-        private readonly TokenType[] tokenTypes = Utils.tokenTypes.Where(t => t.Code != "space" && t.Code != "comment" && t.Code != "preproc"&& t.Code != "pipe").Select(t => t).ToArray();
+        private readonly TokenType[] tokenTypes = Utils.tokenTypes.Where(t => t.Code != "space" && t.Code != "comment" && t.Code != "preproc" && t.Code != "pipe").Select(t => t).ToArray();
 
         public LexicalScanner()
         {
@@ -35,7 +35,7 @@ namespace CompilerC__.CompilerSteps
         {
             List<Token>? foundToken = new();
 
-            if (CurrentLine >= FileLines.Count)
+            if (FileLines == null || CurrentLine >= FileLines?.Count)
             {
                 foundToken = new List<Token> { new Token(Utils.tokenTypes.Where(t => t.Code == "eos").Select(t => t).ToArray()[0].Code, string.Empty) };
             }
@@ -85,10 +85,10 @@ namespace CompilerC__.CompilerSteps
             if (foundToken != null && foundToken.Count > 0)
             {
                 MergeComposedTokens(foundToken);
-                
+
                 if (Utils.debugMode)
                     Console.WriteLine($"token found : {foundToken.Select(t => t.Type).Aggregate((a, b) => $"{a} {b}")}\n");
-                
+
                 TokenBuffer.AddRange(foundToken);
             }
 
