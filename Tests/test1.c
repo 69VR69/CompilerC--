@@ -1,5 +1,5 @@
 ﻿#include <stdio.h>
-//TODO : fix set/get adress following the function addition
+
 int a()
 {
 	int b;

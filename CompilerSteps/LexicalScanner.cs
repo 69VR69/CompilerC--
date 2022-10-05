@@ -91,6 +91,8 @@ namespace CompilerC__.CompilerSteps
 
                 TokenBuffer.AddRange(foundToken);
             }
+            else
+                return Next();
 
             return foundToken;
         }

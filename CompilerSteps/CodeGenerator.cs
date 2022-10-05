@@ -61,19 +61,22 @@ namespace CompilerC__.CompilerSteps
 
             } while (true);
 
+            sb.AppendLine("");
+
             sb.AppendLine(".start")
                 .AppendLine("prep main")
                 .AppendLine("call 0")
                 .AppendLine("halt");
 
-            sb.AppendLine($@".addrof
-                                get -1
-                                get 0
-                                sub
-                                push 1
-                                sub
-                                ret"
-                                );
+            sb.AppendLine("");
+            
+            sb.AppendLine($@".addrof")
+                .AppendLine("get -1")
+                .AppendLine("get 0")
+                .AppendLine("sub")
+                .AppendLine("push 1")
+                .AppendLine("sub")
+                .AppendLine("ret");
 
 
             GeneratedCode = sb.ToString();
@@ -298,15 +301,15 @@ namespace CompilerC__.CompilerSteps
                 GenerateNodeCode(child, sb);
         }
 
-        private string GetLabel(string label)
+        private static string GetLabel(string label)
         {
             return Labels[label] + LabelCounter[label];
         }
-        private string GetNewLabel(string label, bool post = false)
+        private static string GetNewLabel(string label, bool post = false)
         {
             return Labels[label] + (post ? LabelCounter[label]++ : ++LabelCounter[label]);
         }
-        private void SetLabelCounter(string label)
+        private static void SetLabelCounter(string label)
         {
             LabelCounter[Labels.FirstOrDefault(x => x.Value == Regex.Match(label, @"\D+").Value).Key] = int.Parse(Regex.Match(label, @"\d+").Value);
         }

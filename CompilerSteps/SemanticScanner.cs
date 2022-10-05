@@ -95,15 +95,16 @@ namespace CompilerC__.CompilerSteps
                 case "addrOf":
                     if (n.Childs[0].Type != "ident")
                         Utils.PrintError("addrof_not_on_ident", true, n.Childs[0]);
+
                     SemNode(n.Childs[0]);
                     break;
 
                 case "assign":
-                    if (n.Childs[0].Type != "ident" || n.Childs[0].Value != "indirection")
-                        Utils.PrintError("assign_to_non_var", arg: n.Childs[0].Type);
-                    else
+                    if (n.Childs[0].Type == "ident" || n.Childs[0].Value == "indirection")
                         foreach (Node c in n.Childs)
                             SemNode(c);
+                    else
+                        Utils.PrintError("assign_to_non_var", arg: n.Childs[0].Type);
                     break;
 
                 case "declaration":
@@ -112,7 +113,9 @@ namespace CompilerC__.CompilerSteps
                         if (c.Value == null)
                             Utils.PrintError("var_without_ident", arg: c.Value);
 
-                        Declare(c, Utils.GetSymbolType("var"));
+                        Symbol symbol = Declare(c, Utils.GetSymbolType("var"));
+                        c.Address = symbol.Address;
+
                     }
                     break;
             }
@@ -125,6 +128,7 @@ namespace CompilerC__.CompilerSteps
 
             if (lastTable.Any(s => s.Ident == ident))
                 Utils.PrintError("symbol_already_declared", true, arg: ident);
+
             if (type == Utils.GetSymbolType("var"))
             {
                 lastTable.Add(new(type, ident, address: Utils.nbVar));
