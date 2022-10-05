@@ -92,8 +92,14 @@ namespace CompilerC__.CompilerSteps
                     n.Address = SearchSymbol(n.Value, Utils.GetSymbolType("var")).Address;
                     break;
 
-                case "assign":
+                case "addrOf":
                     if (n.Childs[0].Type != "ident")
+                        Utils.PrintError("addrof_not_on_ident", true, n.Childs[0]);
+                    SemNode(n.Childs[0]);
+                    break;
+
+                case "assign":
+                    if (n.Childs[0].Type != "ident" || n.Childs[0].Value != "indirection")
                         Utils.PrintError("assign_to_non_var", arg: n.Childs[0].Type);
                     else
                         foreach (Node c in n.Childs)
@@ -118,7 +124,7 @@ namespace CompilerC__.CompilerSteps
             string ident = node.Value;
 
             if (lastTable.Any(s => s.Ident == ident))
-                Utils.PrintError("symbol_already_declared",true, arg: ident);
+                Utils.PrintError("symbol_already_declared", true, arg: ident);
             if (type == Utils.GetSymbolType("var"))
             {
                 lastTable.Add(new(type, ident, address: Utils.nbVar));

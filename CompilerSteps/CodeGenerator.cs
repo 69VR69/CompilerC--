@@ -66,6 +66,16 @@ namespace CompilerC__.CompilerSteps
                 .AppendLine("call 0")
                 .AppendLine("halt");
 
+            sb.AppendLine($@".addrof
+                                get -1
+                                get 0
+                                sub
+                                push 1
+                                sub
+                                ret"
+                                );
+
+
             GeneratedCode = sb.ToString();
 
             Console.WriteLine("\nCode Generation end !\n\n");
@@ -77,7 +87,7 @@ namespace CompilerC__.CompilerSteps
 
         private StringBuilder GenerateNodeCode(Node root, StringBuilder sb)
         {
-            switch (root.Type) //block ?
+            switch (root.Type)
             {
                 case "declaration":
                     break;
@@ -90,10 +100,31 @@ namespace CompilerC__.CompilerSteps
                     sb.AppendLine($"get {root.Address}");
                     break;
 
+                case "indirection":
+                    GenerateNodeCode(root.Childs[0], sb);
+                    sb.AppendLine("read");
+                    break;
+
+                case "addrOf":
+                    sb.AppendLine($"prep .addrof");
+                    sb.AppendLine($"push {Utils.nbVar}");
+                    sb.AppendLine($"call 1");
+                    break;
+
                 case "assign":
-                    GenerateNodeCode(root.Childs[1], sb);
-                    sb.AppendLine($"dup");
-                    sb.AppendLine($"set {root.Childs[0].Address}");
+                    if (root.Childs[0].Type == "ident")
+                    {
+                        GenerateNodeCode(root.Childs[1], sb);
+                        sb.AppendLine($"dup");
+                        sb.AppendLine($"set {root.Childs[0].Address}");
+                    }
+                    else
+                    {
+                        GenerateNodeCode(root.Childs[1], sb);
+                        sb.AppendLine("dup");
+                        GenerateNodeCode(root.Childs[0].Childs[0], sb);
+                        sb.AppendLine("write");
+                    }
                     break;
 
                 ////////////////////////////////////////////////////////////////
@@ -211,6 +242,17 @@ namespace CompilerC__.CompilerSteps
                     break;
 
                 ////////////////////////////////////////////////////////////////
+
+                case "receive":
+                    sb.AppendLine($"recv");
+                    break;
+
+                case "send":
+                    GenerateCodeForChilds(root, sb);
+                    sb.AppendLine($"send");
+                    break;
+
+                ////////////////////////////////////////////////////////////////
                 case "block":
                 case "seq":
                     GenerateCodeForChilds(root, sb);
@@ -220,9 +262,7 @@ namespace CompilerC__.CompilerSteps
                     GenerateCodeForChilds(root, sb);
                     sb.AppendLine(root.Type);
                     break;
-
             }
-
 
             return sb;
         }
@@ -244,7 +284,7 @@ namespace CompilerC__.CompilerSteps
         {
             return SemanticScanner.SyntaxScanner.LexicalScanner;
         }
-        
+
         public void AddFileToLexical(List<string> fileLines)
         {
             LexicalScanner lexicalScanner = GetLexicalScanner();

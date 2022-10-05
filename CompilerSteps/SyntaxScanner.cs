@@ -43,13 +43,19 @@ namespace CompilerC__.CompilerSteps
                     declaration = new Node("declaration");
                     Token temp;
                     temp = LexicalScanner.Current;
-                    declaration.Childs.Add(new(temp, withValue: true));
+                    if (Check("star"))
+                        declaration.Childs.Add(new("indirection", childs: new Node(temp, withValue: true)));
+                    else
+                        declaration.Childs.Add(new(temp, withValue: true));
 
                     while (Check("comma"))
                     {
                         Accept("int");
                         temp = LexicalScanner.Current;
-                        declaration.Childs.Add(new(temp, withValue: true));
+                        if (Check("star"))
+                            declaration.Childs.Add(new("indirection", childs: new Node(temp, withValue: true)));
+                        else
+                            declaration.Childs.Add(new(temp, withValue: true));
                     }
                 }
                 Accept("parenthesisOut");
@@ -59,7 +65,10 @@ namespace CompilerC__.CompilerSteps
                 return new Node("function", value: ident, line, declaration, instr);
             }
             else
-                return Instruction();
+            {
+                Utils.PrintError("function_declaration_missing", true, LexicalScanner.Current.Line);
+                return new Node();
+            }
         }
 
         private Node Instruction()
@@ -92,7 +101,12 @@ namespace CompilerC__.CompilerSteps
                 do
                 {
                     Token ident = LexicalScanner.Current;
-                    declaration.Childs.Add(new("var", ident.Value, ident.Line));
+
+                    if (Check("star"))
+                        declaration.Childs.Add(new("indirection", childs: new Node(ident, withValue: true)));
+                    else
+                        declaration.Childs.Add(new(ident, withValue: true));
+
                     LexicalScanner.NextToken();
                 } while (Check("comma"));
 
@@ -149,6 +163,14 @@ namespace CompilerC__.CompilerSteps
                 Accept("semicolon");
                 return new Node("return", expr);
             }
+            else if (Check("send"))
+            {
+                Accept("parenthesisIn");
+                Node expr = Expression();
+                Accept("parenthesisOut");
+                Accept("semicolon");
+                return new Node("send", expr);
+            }
             else
             {
                 Node e = Expression();
@@ -167,18 +189,20 @@ namespace CompilerC__.CompilerSteps
         {
             if (Check("minus"))
             {
-                Node node = Prefixe();
-                return node;
+                return new ("sub", new Node("const", value: "0", 0), Prefixe());
             }
             else if (Check("plus"))
             {
-                Node node = Prefixe();
-                return node;
+                return Prefixe();
             }
             else if (Check("exclamation"))
             {
-                Node node = Prefixe();
-                return node;
+                return new("not", Prefixe());
+
+            }
+            else if (Check("ampersand"))
+            {
+                return new("addrOf", Prefixe());
             }
             else
             {
@@ -232,6 +256,10 @@ namespace CompilerC__.CompilerSteps
                 else
                     return new(token, withValue: true);
             }
+            else if (Check("receive"))
+            {
+                return new("receive");
+            }
             else
             {
                 Token token = LexicalScanner.Current;
@@ -263,7 +291,7 @@ namespace CompilerC__.CompilerSteps
         }
         private void Accept(string tokenType)
         {
-           LexicalScanner.Accept(Utils.GetTokenType(tokenType));
+            LexicalScanner.Accept(Utils.GetTokenType(tokenType));
         }
     }
 }

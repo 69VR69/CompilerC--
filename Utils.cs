@@ -37,6 +37,7 @@ namespace CompilerC__
             new CompilerException("unrecognized_symboltype","One or more unrecognized symbol type: '{0}'"),
             new CompilerException("unrecognized_operation","One or more unrecognized operation: '{0}'"),
             new CompilerException("unrecognized_token","Unrecognized token '{0}' at line {1}"),
+            new CompilerException("function_declaration_missing","Function declaration missing at line {0}"),
             
             // Semantic exceptions
             new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
@@ -45,6 +46,7 @@ namespace CompilerC__
             new CompilerException("function_already_exist","Function '{0}' already declared"),
             new CompilerException("function_not_found","Function '{0}' not found"),
             new CompilerException("wrong_number_of_parameters","Wrong number of parameters provide to function named '{0}'"),
+            new CompilerException("addrof_not_on_ident","Get the address of the non-indent '{0}' is impossible"),
         };
 
         public static void PrintError(string exceptionCode, bool isBlocking = false, object? arg = null)
@@ -121,6 +123,8 @@ namespace CompilerC__
             new TokenType("do", 10,regex: "do" ),
             new TokenType("break",10, regex: "break" ),
             new TokenType("continue",10,regex: "continue" ),
+            new TokenType("send",10,regex: "send" ),
+            new TokenType("receive",10,regex: "recv" ),
         };
         public static void AddComposedTokenTypes()
         {
@@ -178,6 +182,10 @@ namespace CompilerC__
             new ("and"),
             new ("or"),
             new ("assign"),
+            new ("indirection"),
+            new ("addrOf"),
+            new ("send"),
+            new ("receive"),
             new ("break"),
             new ("continue"),
             new ("continueLabel"),
