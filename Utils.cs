@@ -14,6 +14,7 @@ namespace CompilerC__
     internal static class Utils
     {
         public static int nbVar = 0;
+        public static bool isEOS = false;
 
         #region Exception Management
 
