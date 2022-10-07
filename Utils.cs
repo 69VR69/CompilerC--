@@ -18,11 +18,12 @@ namespace CompilerC__
 
         #region Exception Management
 
+        public static bool testMode = false;
         public static bool debugMode = false;
-        public static List<CompilerException> exceptions = new List<CompilerException>
+        public static List<CompilerException> exceptions = new()
         {
             new CompilerException("unknow_error","An exception was trown, error message : {0}"),
-            new CompilerException("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug>"),
+            new CompilerException("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug> <--test>"),
             
             // File exceptions
             new CompilerException("invalid_file_extension","Invalid file extension, file path provide : {0}"),
@@ -101,6 +102,8 @@ namespace CompilerC__
             new TokenType("parenthesisOut",0,')'),
             new TokenType("bracketIn",0, '{'),
             new TokenType("bracketOut",0, '}'),
+            new TokenType("squareBracketIn",0, '['),
+            new TokenType("squareBracketOut",0, ']'),
             new TokenType("semicolon",0, ';'),
             new TokenType("plus",0, '+'),
             new TokenType("minus",0, '-'),

@@ -189,7 +189,7 @@ namespace CompilerC__.CompilerSteps
         {
             if (Check("minus"))
             {
-                return new ("sub", new Node("const", value: "0", 0), Prefixe());
+                return new("sub", new Node("const", value: "0", 0), Prefixe());
             }
             else if (Check("plus"))
             {
@@ -213,7 +213,17 @@ namespace CompilerC__.CompilerSteps
 
         private Node Sufixe()
         {
-            return Atome();
+            Node n = Atome();
+
+            while(Check("squareBracketIn"))
+            {
+                Node index = Expression();
+                Accept("squareBracketOut");
+
+                n = new("indirection", new Node("add", n, index));
+            }
+            
+            return n;
         }
 
         private Node Atome()

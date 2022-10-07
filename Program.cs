@@ -30,9 +30,14 @@ namespace CompilerC__
 
                 if (args.Length > 1)
                 {
-                    if (args[1] == "--debug")
+                   if (args.Contains("--debug"))
                     {
                         Utils.debugMode = true;
+                    }
+
+                    if (args.Contains("--test"))
+                    {
+                       Utils.testMode = true;
                     }
                 }
 
