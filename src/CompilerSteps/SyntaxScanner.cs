@@ -1,6 +1,7 @@
 ﻿using System.Xml.Linq;
 
 using CompilerC__.Objects;
+using CompilerC__.src;
 
 namespace CompilerC__.CompilerSteps
 {
@@ -41,21 +42,24 @@ namespace CompilerC__.CompilerSteps
                 if (Check("int"))
                 {
                     declaration = new Node("declaration");
-                    Token temp;
-                    temp = LexicalScanner.Current;
+
                     if (Check("star"))
-                        declaration.Childs.Add(new("indirection", childs: new Node(temp, withValue: true)));
+                        declaration.Childs.Add(new("indirection", childs: new Node(LexicalScanner.Current, withValue: true)));
                     else
-                        declaration.Childs.Add(new(temp, withValue: true));
+                        declaration.Childs.Add(new(LexicalScanner.Current, withValue: true));
+
+                    LexicalScanner.NextToken();
 
                     while (Check("comma"))
                     {
                         Accept("int");
-                        temp = LexicalScanner.Current;
+
                         if (Check("star"))
-                            declaration.Childs.Add(new("indirection", childs: new Node(temp, withValue: true)));
+                            declaration.Childs.Add(new("indirection", childs: new Node(LexicalScanner.Current, withValue: true)));
                         else
-                            declaration.Childs.Add(new(temp, withValue: true));
+                            declaration.Childs.Add(new(LexicalScanner.Current, withValue: true));
+
+                        LexicalScanner.NextToken();
                     }
                 }
                 Accept("parenthesisOut");
@@ -100,12 +104,10 @@ namespace CompilerC__.CompilerSteps
 
                 do
                 {
-                    Token ident = LexicalScanner.Current;
-
                     if (Check("star"))
-                        declaration.Childs.Add(new("indirection", childs: new Node(ident, withValue: true)));
+                        declaration.Childs.Add(new("indirection", childs: new Node(LexicalScanner.Current, withValue: true)));
                     else
-                        declaration.Childs.Add(new(ident, withValue: true));
+                        declaration.Childs.Add(new(LexicalScanner.Current, withValue: true));
 
                     LexicalScanner.NextToken();
                 } while (Check("comma"));
@@ -204,6 +206,10 @@ namespace CompilerC__.CompilerSteps
             {
                 return new("addrOf", Prefixe());
             }
+            else if (Check("star"))
+            {
+                return new("indirection", Prefixe());
+            }
             else
             {
                 Node node = Sufixe();
@@ -215,14 +221,14 @@ namespace CompilerC__.CompilerSteps
         {
             Node n = Atome();
 
-            while(Check("squareBracketIn"))
+            while (Check("squareBracketIn"))
             {
                 Node index = Expression();
                 Accept("squareBracketOut");
 
                 n = new("indirection", new Node("add", n, index));
             }
-            
+
             return n;
         }
 

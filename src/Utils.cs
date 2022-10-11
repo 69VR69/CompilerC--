@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using CompilerC__.Objects;
 using CompilerC__.Objects.Types;
 
-namespace CompilerC__
+namespace CompilerC__.src
 {
     internal static class Utils
     {
@@ -78,7 +78,7 @@ namespace CompilerC__
 
             // Print or raise exception
             if (isBlocking)
-                throw new System.Exception(message);
+                throw new Exception(message);
 
             Console.Error.WriteLine(message);
 
@@ -148,7 +148,7 @@ namespace CompilerC__
             TokenType? t = tokenTypes.Find(t => t.Code == code);
 
             if (t == null)
-                Utils.PrintError("unrecognized_tokentype", true, code);
+                PrintError("unrecognized_tokentype", true, code);
 
             return t;
         }
@@ -157,7 +157,7 @@ namespace CompilerC__
             TokenType[]? t = tokenTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
 
             if (t == null)
-                Utils.PrintError("unrecognized_tokentype", true, code);
+                PrintError("unrecognized_tokentype", true, code);
 
             return t;
         }
@@ -205,7 +205,7 @@ namespace CompilerC__
             NodeType? n = nodeTypes.Find(t => t.Code == code);
 
             if (n == null)
-                Utils.PrintError("unrecognized_nodetype", true, code);
+                PrintError("unrecognized_nodetype", true, code);
 
             return n;
         }
@@ -214,7 +214,7 @@ namespace CompilerC__
             NodeType[]? n = nodeTypes.Where(t => code.Contains(t.Code)).Select(t => t).ToArray();
 
             if (n == null)
-                Utils.PrintError("unrecognized_nodetype", true, code);
+                PrintError("unrecognized_nodetype", true, code);
 
             return n;
         }
@@ -272,7 +272,7 @@ namespace CompilerC__
             SymbolType? s = symbolTypes.Find(t => t.Code == symbolType);
 
             if (s == null)
-                Utils.PrintError("unrecognized_symboltype", true, symbolType);
+                PrintError("unrecognized_symboltype", true, symbolType);
 
             return s;
         }
@@ -282,7 +282,7 @@ namespace CompilerC__
             SymbolType[]? s = symbolTypes.Where(t => symbolType.Contains(t.Code)).Select(t => t).ToArray();
 
             if (s == null)
-                Utils.PrintError("unrecognized_symboltype", true, symbolType);
+                PrintError("unrecognized_symboltype", true, symbolType);
 
             return s;
         }
@@ -290,5 +290,39 @@ namespace CompilerC__
         #endregion Operators
 
         #endregion Objects
+
+        #region Methods
+
+        public static List<string> LoadFileFromPath(string path)
+        {
+            Console.WriteLine("\nStart loading file");
+
+            if (!File.Exists(path))
+            {
+                Utils.PrintError("file_not_exist", false, path);
+                return new List<string>();
+            }
+
+            List<string>? fileLines = null;
+            try
+            {
+                fileLines = File.ReadLines(path).ToList();
+            }
+            catch (Exception e)
+            {
+                Utils.PrintError("file_read_error", false, e.Message);
+            }
+
+            if (fileLines == null || fileLines.Count == 0)
+            {
+                Utils.PrintError("file_empty");
+            }
+
+            Console.WriteLine("\nEnd loading file");
+
+            return fileLines;
+        }
+
+        #endregion Methods
     }
 }

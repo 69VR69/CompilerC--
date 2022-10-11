@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 
 using CompilerC__.Objects;
 using CompilerC__.Objects.Types;
+using CompilerC__.src;
 
 namespace CompilerC__.CompilerSteps
 {
@@ -43,10 +44,11 @@ namespace CompilerC__.CompilerSteps
             };
         }
 
-        public void GenerateCode()
+        public string GenerateCode(string? src = null)
         {
             Console.WriteLine("\n\nCode Generation start !\n");
-            StringBuilder sb = new();
+
+            StringBuilder sb = new(src);
 
             do
             {
@@ -69,7 +71,7 @@ namespace CompilerC__.CompilerSteps
                 .AppendLine("halt");
 
             sb.AppendLine("");
-            
+
             sb.AppendLine($@".addrof")
                 .AppendLine("get -1")
                 .AppendLine("get 0")
@@ -86,6 +88,8 @@ namespace CompilerC__.CompilerSteps
             if (Utils.debugMode)
                 Console.WriteLine($"Generated assembly code :\n{GeneratedCode}");
             //CreateFileFromString();
+
+            return GeneratedCode;
         }
 
         private StringBuilder GenerateNodeCode(Node root, StringBuilder sb)

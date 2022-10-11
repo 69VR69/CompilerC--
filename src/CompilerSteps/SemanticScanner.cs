@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using CompilerC__.Objects;
 using CompilerC__.Objects.Types;
+using CompilerC__.src;
 
 namespace CompilerC__.CompilerSteps
 {
@@ -54,15 +55,12 @@ namespace CompilerC__.CompilerSteps
 
                     Symbol s = Declare(n, Utils.GetSymbolType("func"));
 
-                    StartBlock();
-
                     if (s == null)
                         Utils.PrintError("function_already_exist", true, n.Value);
 
                     foreach (Node c in n.Childs)
                         SemNode(c);
 
-                    EndBlock();
                     break;
 
                 case "call":
@@ -113,7 +111,11 @@ namespace CompilerC__.CompilerSteps
                         if (c.Value == null)
                             Utils.PrintError("var_without_ident", arg: c.Value);
 
-                        Symbol symbol = Declare(c, Utils.GetSymbolType("var"));
+                        Node t = c;
+                        while (t.Type == "indirection")
+                            t = t.Childs[0];
+
+                        Symbol symbol = Declare(t, Utils.GetSymbolType("var"));
                         c.Address = symbol.Address;
 
                     }

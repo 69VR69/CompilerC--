@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 using CompilerC__.Objects;
 using CompilerC__.Objects.Types;
+using CompilerC__.src;
 
 namespace CompilerC__.CompilerSteps
 {

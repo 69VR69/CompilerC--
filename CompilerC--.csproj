@@ -8,4 +8,18 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ContentWithTargetPath Include="runtime\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>runtime\%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ContentWithTargetPath Include="test\**">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>test\%(RecursiveDir)\%(Filename)%(Extension)</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup>
+
 </Project>
