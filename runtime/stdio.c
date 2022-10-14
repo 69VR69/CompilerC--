@@ -1,18 +1,22 @@
 int print (int n) {
 	
-	int[] digits = new int[10];
-    int i = 0;
+	int[] digits;
+    int i;
+	i = 0;
     
     while (n > 0)
     {
         digits[i] = n % 10;
-        n /= 10;
-        i++;
+        n = n / 10;
+        i = i + 1;
     }
-            
-    for (int j = i - 1; j >= 0; j--)
+       
+	int j;     
+    for (j = i - 1; j >= 0; j = j - 1)
     {
-        int ascii = digits[j] + 48;
-        Console.Write((char)ascii);
+        send(digits[j] + 48);
+		
     }
+	
+	send(10);
 }

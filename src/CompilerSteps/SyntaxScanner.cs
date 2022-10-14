@@ -44,9 +44,18 @@ namespace CompilerC__.CompilerSteps
                     declaration = new Node("declaration");
 
                     if (Check("star"))
+                    {
                         declaration.Childs.Add(new("indirection", childs: new Node(LexicalScanner.Current, withValue: true)));
+                    }
+                    else if (Check("squareBracketIn"))
+                    {
+                        Accept("squareBracketOut");
+                        declaration.Childs.Add(new("indirection", childs: new Node(LexicalScanner.Current, withValue: true)));
+                    }
                     else
+                    {
                         declaration.Childs.Add(new(LexicalScanner.Current, withValue: true));
+                    }
 
                     LexicalScanner.NextToken();
 
@@ -105,9 +114,18 @@ namespace CompilerC__.CompilerSteps
                 do
                 {
                     if (Check("star"))
+                    {
                         declaration.Childs.Add(new("indirection", childs: new Node(LexicalScanner.Current, withValue: true)));
+                    }
+                    else if (Check("squareBracketIn"))
+                    {
+                        Accept("squareBracketOut");
+                        declaration.Childs.Add(new("indirection", childs: new Node(LexicalScanner.Current, withValue: true)));
+                    }
                     else
+                    {
                         declaration.Childs.Add(new(LexicalScanner.Current, withValue: true));
+                    }
 
                     LexicalScanner.NextToken();
                 } while (Check("comma"));
