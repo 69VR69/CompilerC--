@@ -43,11 +43,12 @@ namespace CompilerC__.src
             // Semantic exceptions
             new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
             new CompilerException("symbol_already_declared","A symbol with the identification code '{0}' is already declared in this scope"),
-            new CompilerException("assign_to_non_var","Assignation to '{0}' is impossible as it's not a variable"),
+            new CompilerException("assign_to_non_var","Assignation to '{0}' is impossible as it's not a variable at line {1}"),
             new CompilerException("function_already_exist","Function '{0}' already declared"),
+            new CompilerException("var_without_ident","Cannot use a variable '{0}' without value at line {1}"),
             new CompilerException("function_not_found","Function '{0}' not found"),
             new CompilerException("wrong_number_of_parameters","Wrong number of parameters provide to function named '{0}'"),
-            new CompilerException("addrof_not_on_ident","Get the address of the non-indent '{0}' is impossible"),
+            new CompilerException("addrof_not_on_ident","Get the address of the non-indent '{0}' is impossible  at line {1}"),
         };
 
         public static void PrintError(string exceptionCode, bool isBlocking = false, object? arg = null)

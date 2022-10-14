@@ -6,7 +6,6 @@ namespace CompilerC__.src
 {
     internal class Program
     {
-
         static void Main(string[] args)
         {
             // Init Utils
@@ -88,7 +87,6 @@ namespace CompilerC__.src
                 #endregion Source
 
                 #endregion Compile
-
             }
             catch (Exception e)
             {

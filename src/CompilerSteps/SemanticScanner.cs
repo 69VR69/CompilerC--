@@ -58,8 +58,14 @@ namespace CompilerC__.CompilerSteps
                     if (s == null)
                         Utils.PrintError("function_already_exist", true, n.Value);
 
+                    if (n.Childs[0].Childs.Count > 0)
+                        StartBlock();
+
                     foreach (Node c in n.Childs)
                         SemNode(c);
+
+                    if (n.Childs[0].Childs.Count > 0)
+                        EndBlock();
 
                     break;
 
@@ -85,31 +91,31 @@ namespace CompilerC__.CompilerSteps
 
                 case "ident":
                     if (n.Value == null)
-                        Utils.PrintError("var_without_ident", arg: n.Value);
+                        Utils.PrintError("var_without_ident", true, n.Value, n.Line);
 
                     n.Address = SearchSymbol(n.Value, Utils.GetSymbolType("var")).Address;
                     break;
 
                 case "addrOf":
                     if (n.Childs[0].Type != "ident")
-                        Utils.PrintError("addrof_not_on_ident", true, n.Childs[0]);
+                        Utils.PrintError("addrof_not_on_ident", true, n.Childs[0], n.Line);
 
                     SemNode(n.Childs[0]);
                     break;
 
                 case "assign":
-                    if (n.Childs[0].Type == "ident" || n.Childs[0].Value == "indirection")
+                    if (n.Childs[0].Type == "ident" || n.Childs[0].Type == "indirection")
                         foreach (Node c in n.Childs)
                             SemNode(c);
                     else
-                        Utils.PrintError("assign_to_non_var", arg: n.Childs[0].Type);
+                        Utils.PrintError("assign_to_non_var", true, n.Childs[0].Type, n.Line);
                     break;
 
                 case "declaration":
                     foreach (Node c in n.Childs)
                     {
                         if (c.Value == null)
-                            Utils.PrintError("var_without_ident", arg: c.Value);
+                            Utils.PrintError("var_without_ident", true, c.Value, c.Line);
 
                         Node t = c;
                         while (t.Type == "indirection")
@@ -125,7 +131,7 @@ namespace CompilerC__.CompilerSteps
 
         private Symbol Declare(Node node, SymbolType type)
         {
-            HashSet<Symbol> lastTable = SymbolTable.Last();
+            HashSet<Symbol> lastTable = SymbolTable.Peek();
             string ident = node.Value;
 
             if (lastTable.Any(s => s.Ident == ident))
