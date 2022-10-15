@@ -296,7 +296,8 @@ namespace CompilerC__.src
 
         public static List<string> LoadFileFromPath(string path)
         {
-            Console.WriteLine("\nStart loading file");
+            if (Utils.debugMode)
+                Console.WriteLine("\nStart loading file");
 
             if (!File.Exists(path))
             {
@@ -319,7 +320,8 @@ namespace CompilerC__.src
                 Utils.PrintError("file_empty");
             }
 
-            Console.WriteLine("\nEnd loading file");
+            if (Utils.debugMode)
+                Console.WriteLine("End loading file\n");
 
             return fileLines;
         }

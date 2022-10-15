@@ -17,12 +17,13 @@ namespace CompilerC__.CompilerSteps
         // General
         public Node SS()
         {
-
-            Console.WriteLine("\n\nSyntax scanning start !\n");
+            if (Utils.debugMode)
+                Console.WriteLine("\nSyntax scanning start !");
 
             Node node = Function();
 
-            Console.WriteLine("\n\nSyntax scanning end !\n");
+            if (Utils.debugMode)
+                Console.WriteLine("Syntax scanning end !\n");
 
             return node;
         }

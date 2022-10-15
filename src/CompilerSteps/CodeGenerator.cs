@@ -46,7 +46,8 @@ namespace CompilerC__.CompilerSteps
 
         public string GenerateCode(string? src = null)
         {
-            Console.WriteLine("\n\nCode Generation start !\n");
+            if(Utils.debugMode)
+            Console.WriteLine("\nCode Generation start !");
 
             StringBuilder sb = new(src);
 
@@ -56,6 +57,7 @@ namespace CompilerC__.CompilerSteps
 
                 if (Utils.debugMode)
                     Console.WriteLine($"Tree node generated : \n{node}\n");
+                
                 sb = GenerateNodeCode(node, sb);
 
                 if (GetLexicalScanner().Current.Type == Utils.GetNodeType("eos").Code)
@@ -83,7 +85,8 @@ namespace CompilerC__.CompilerSteps
 
             GeneratedCode = sb.ToString();
 
-            Console.WriteLine("\nCode Generation end !\n\n");
+            if (Utils.debugMode)
+                Console.WriteLine("Code Generation end !\n");
 
             if (Utils.debugMode)
                 Console.WriteLine($"Generated assembly code :\n{GeneratedCode}");
@@ -284,7 +287,7 @@ namespace CompilerC__.CompilerSteps
             f.Write(data, 0, data.Length);
             f.Close();
 
-            Console.WriteLine($"File generated at : {f.Name}");
+            Console.WriteLine($"File generated at : {f.Name}\n");
         }
 
         private LexicalScanner GetLexicalScanner()

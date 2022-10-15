@@ -46,28 +46,17 @@ namespace CompilerC__.src
 
                 #region Compile
                 CodeGenerator codeGenerator = new();
+                StringBuilder assemblyCode = new();
 
                 #region Runtime
 
                 Console.WriteLine("\nStart runtime compilation");
-
+                
                 string runtimePath = Path.Combine(Directory.GetCurrentDirectory(), "runtime");
-                string[] filepaths = Directory.GetFiles(runtimePath, "*.c", SearchOption.AllDirectories);
 
-                string fileName;
-                StringBuilder runtimeCode = new();
+                LaunchCompilation(runtimePath, assemblyCode, true);
 
-                foreach (string filepath in filepaths)
-                {
-                    fileName = Path.GetFileName(filepath);
-                    Console.WriteLine($"\t\tStart compiling {fileName}");
-                    codeGenerator = new();
-                    codeGenerator.AddFileToLexical(Utils.LoadFileFromPath(filepath));
-                    runtimeCode.AppendLine(codeGenerator.GenerateCode());
-                    Console.WriteLine($"\t\tEnd compiling {fileName}");
-                }
-
-                Console.WriteLine("\nEnd runtime compilation");
+                Console.WriteLine("End runtime compilation\n");
 
                 #endregion Runtime
 
@@ -75,22 +64,47 @@ namespace CompilerC__.src
 
                 Console.WriteLine("\nStart source compilation");
 
-                fileName = Path.GetFileName(filePath);
-                Console.WriteLine($"\t\tStart compiling {fileName}");
-                codeGenerator = new();
-                codeGenerator.AddFileToLexical(Utils.LoadFileFromPath(filePath));
-                codeGenerator.GenerateCode(runtimeCode.ToString());
-                Console.WriteLine($"\t\tEnd compiling {fileName}");
+                LaunchCompilation(filePath, assemblyCode, false);
 
-                Console.WriteLine("\nEnd source compilation");
+                Console.WriteLine("End source compilation\n");
 
                 #endregion Source
 
                 #endregion Compile
+
+                #region Print assembly code
+
+                Console.WriteLine("\nAssembly code:");
+                Console.WriteLine(assemblyCode);
+
+                #endregion Print assembly code
+
             }
             catch (Exception e)
             {
                 Utils.PrintError("unknow_error", false, e.ToString());
+            }
+        }
+
+        public static void LaunchCompilation(string path, StringBuilder sb, bool isDirectory = false)
+        {
+            if (isDirectory)
+            {
+                string[] filepaths = Directory.GetFiles(path, "*.c", SearchOption.AllDirectories);
+
+                foreach (string filepath in filepaths)
+                {
+                    LaunchCompilation(filepath, sb, false);
+                }
+            }
+            else
+            {
+                string fileName = Path.GetFileName(path);
+                Console.WriteLine($"\nStart compiling {fileName}");
+                CodeGenerator codeGenerator = new();
+                codeGenerator.AddFileToLexical(Utils.LoadFileFromPath(path));
+                sb.AppendLine(codeGenerator.GenerateCode());
+                Console.WriteLine($"End compiling {fileName}\n");
             }
         }
     }

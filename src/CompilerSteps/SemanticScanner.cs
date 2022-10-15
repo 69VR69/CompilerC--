@@ -29,14 +29,16 @@ namespace CompilerC__.CompilerSteps
             Utils.nbVar = 0;
 
 
-            Console.WriteLine("\n\nSemantic scanning start !\n");
+            if (Utils.debugMode)
+                Console.WriteLine("\nSemantic scanning start !");
 
             SemNode(n);
 
             // function node contain the number of variables in the function sub by number of parameters
             n.Address = Utils.nbVar - n.Childs[0].Childs.Count;
 
-            Console.WriteLine("\nSemantic scanning end !\n\n");
+            if (Utils.debugMode)
+                Console.WriteLine("Semantic scanning end !\n");
 
 
             return n;
@@ -74,8 +76,6 @@ namespace CompilerC__.CompilerSteps
 
                     if (s == null)
                         Utils.PrintError("function_not_found", true, n.Value);
-
-                    Console.WriteLine("function " + n + " found, expected \n" + s.NbParam);
 
                     if (s.NbParam != n.Childs.Count)
                         Utils.PrintError("wrong_number_of_parameters", true, n.Value);
