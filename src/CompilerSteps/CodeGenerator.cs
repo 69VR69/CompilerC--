@@ -44,12 +44,12 @@ namespace CompilerC__.CompilerSteps
             };
         }
 
-        public string GenerateCode(string? src = null)
+        public string GenerateCode(string fileName)
         {
             if(Utils.debugMode)
             Console.WriteLine("\nCode Generation start !");
 
-            StringBuilder sb = new(src);
+            StringBuilder sb = new();
 
             do
             {
@@ -90,7 +90,8 @@ namespace CompilerC__.CompilerSteps
 
             if (Utils.debugMode)
                 Console.WriteLine($"Generated assembly code :\n{GeneratedCode}");
-            //CreateFileFromString();
+            
+            CreateFileFromString(fileName);
 
             return GeneratedCode;
         }
@@ -277,11 +278,11 @@ namespace CompilerC__.CompilerSteps
             return sb;
         }
 
-        private void CreateFileFromString()
+        private void CreateFileFromString(string fileName)
         {
             string path = Path.Combine(Directory.GetCurrentDirectory(), "assembly_files");
             Directory.CreateDirectory(path);
-            FileStream? f = File.Create(Path.Combine(path, $"{Path.GetRandomFileName()}.c"));
+            FileStream? f = File.Create(Path.Combine(path, $"{fileName}.c"));
 
             byte[] data = new UTF8Encoding(true).GetBytes(GeneratedCode);
             f.Write(data, 0, data.Length);
