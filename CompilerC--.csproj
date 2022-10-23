@@ -29,4 +29,11 @@
     </ContentWithTargetPath>
   </ItemGroup>
 
+  <ItemGroup>
+    <ContentWithTargetPath Include="cygwin1.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <TargetPath>%(Filename)%(Extension)</TargetPath>
+    </ContentWithTargetPath>
+  </ItemGroup>
+
 </Project>

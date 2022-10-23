@@ -36,6 +36,11 @@ namespace CompilerC__.src
                     {
                         Utils.testMode = true;
                     }
+
+                    if (args.Contains("--simulator"))
+                    {
+                        Utils.withSimulator = true;
+                    }
                 }
 
                 if (!filePath.EndsWith(".c") && !Utils.testMode)
@@ -107,63 +112,7 @@ namespace CompilerC__.src
             }
         }
 
-        public static void LaunchSimulator(string fileName, string assemblyCode)
-        {
-            string tempFile = Path.GetTempFileName();
-            string simulatorPath = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "msm");
-            string logFile = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log", $"{fileName}.txt");
-
-            // Write the assembly code in the temporary file
-            File.WriteAllText(tempFile, assemblyCode);
-
-            // Create the directory log
-            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log"));
-
-            // Execute a make in the simulator directory
-            Process makeProcess = new()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "make",
-                    WorkingDirectory = Path.Combine(Directory.GetCurrentDirectory(), "simulator"),
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
-
-            makeProcess.Start();
-            makeProcess.WaitForExit();
-
-            if (makeProcess.ExitCode != 0)
-            {
-                Utils.PrintError("make_failed");
-                return;
-            }
-
-            // Create a new process and redirect the output to the log file
-            Process simulatorProcess = new()
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = simulatorPath,
-                    Arguments = $"-d \"{tempFile}\"",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                }
-            };
-
-            // Start the process
-            simulatorProcess.Start();
-            File.WriteAllText(logFile, simulatorProcess.StandardOutput.ReadToEnd());
-            File.Delete(tempFile);
-            simulatorProcess.WaitForExit();
-
-            // Print the log file path
-            Console.WriteLine($"\nLog file: {logFile}");
-        }
-
+        #region Compilation Pipeline
         public static void LaunchCompilation(string path, StringBuilder sb, bool isDirectory = false)
         {
             if (isDirectory)
@@ -179,6 +128,7 @@ namespace CompilerC__.src
             {
                 string fileName = Path.GetFileNameWithoutExtension(path);
 
+                Console.WriteLine("----------------------------------------------------------------------------------------------------");
                 Console.WriteLine($"\nStart compiling {fileName}");
 
                 CodeGenerator codeGenerator = new();
@@ -187,12 +137,89 @@ namespace CompilerC__.src
 
                 Console.WriteLine($"End compiling {fileName}\n");
 
-                if (Utils.debugMode)
+                if (Utils.withSimulator)
                 {
-                    LaunchSimulator(fileName, sb.ToString());
+                    LaunchMake(sb.ToString());
+                    LaunchSimulator(fileName);
                 }
 
+                Console.WriteLine("----------------------------------------------------------------------------------------------------");
             }
         }
+
+        public static void LaunchSimulator(string fileName)
+        {
+
+            string tempFile = Path.GetTempFileName();
+            string simulatorPath = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "msm");
+            string logFile = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log", $"{fileName}.txt");
+
+            // Create a new process and redirect the output to the log file
+            Process simulatorProcess = new()
+            {
+                StartInfo = new()
+                {
+                    FileName = Path.Combine(simulatorPath, "msm.exe"),
+                    Arguments = $"-d {tempFile}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            Console.WriteLine($" Execute simulator final command : {simulatorProcess.StartInfo.FileName} {simulatorProcess.StartInfo.Arguments}");
+
+            // Start the process
+            simulatorProcess.Start();
+            simulatorProcess.WaitForExit();
+
+            File.WriteAllText(logFile, simulatorProcess.StandardOutput.ReadToEnd() + simulatorProcess.StandardError.ReadToEnd());
+            File.Delete(tempFile);
+
+            // Print the log file path
+            Console.WriteLine($"\nLog file: {logFile}");
+        }
+
+        public static void LaunchMake(string assemblyCode)
+        {
+            string tempFile = Path.GetTempFileName();
+            string simulatorPath = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "msm");
+
+            // Write the assembly code in the temporary file
+            File.WriteAllText(tempFile, assemblyCode);
+
+            // Create the directory log
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log"));
+
+            string cygwinPath = "C:\\cygwin64\\bin\\bash";
+
+            // Execute a make in the simulator directory through cygwin
+            Process makeProcess = new()
+            {
+                StartInfo = new()
+                {
+                    FileName = cygwinPath,
+                    Arguments = $" --login -c \"cd {simulatorPath.Replace('\\', '/')} && make -B\"",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            Console.WriteLine($" Execute make final command : {makeProcess.StartInfo.FileName} {makeProcess.StartInfo.Arguments}");
+
+            makeProcess.Start();
+            makeProcess.WaitForExit();
+
+            if (makeProcess.ExitCode != 0)
+            {
+                Utils.PrintError("make_failed", false, makeProcess.StandardError.ReadToEnd());
+                return;
+            }
+        }
+
+        #endregion Compilation Pipeline
     }
 }
