@@ -30,6 +30,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="simulator\msm\msm\._msm.txt" />
+    <Content Include="simulator\msm\msm\msm.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ContentWithTargetPath Include="cygwin1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <TargetPath>%(Filename)%(Extension)</TargetPath>

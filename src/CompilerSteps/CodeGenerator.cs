@@ -46,8 +46,8 @@ namespace CompilerC__.CompilerSteps
 
         public string GenerateCode(string fileName)
         {
-            if(Utils.debugMode)
-            Console.WriteLine("\nCode Generation start !");
+            if (Utils.debugMode)
+                Console.WriteLine("\nCode Generation start !");
 
             StringBuilder sb = new();
 
@@ -57,30 +57,13 @@ namespace CompilerC__.CompilerSteps
 
                 if (Utils.debugMode)
                     Console.WriteLine($"Tree node generated : \n{node}\n");
-                
+
                 sb = GenerateNodeCode(node, sb);
 
                 if (GetLexicalScanner().Current.Type == Utils.GetNodeType("eos").Code)
                     break;
 
             } while (true);
-
-            sb.AppendLine("");
-
-            sb.AppendLine(".start")
-                .AppendLine("prep main")
-                .AppendLine("call 0")
-                .AppendLine("halt");
-
-            sb.AppendLine("");
-
-            sb.AppendLine($@".addrof")
-                .AppendLine("get -1")
-                .AppendLine("get 0")
-                .AppendLine("sub")
-                .AppendLine("push 1")
-                .AppendLine("sub")
-                .AppendLine("ret");
 
 
             GeneratedCode = sb.ToString();
@@ -90,7 +73,7 @@ namespace CompilerC__.CompilerSteps
 
             if (Utils.debugMode)
                 Console.WriteLine($"Generated assembly code :\n{GeneratedCode}");
-            
+
             CreateFileFromString(fileName);
 
             return GeneratedCode;
@@ -320,6 +303,26 @@ namespace CompilerC__.CompilerSteps
         private static void SetLabelCounter(string label)
         {
             LabelCounter[Labels.FirstOrDefault(x => x.Value == Regex.Match(label, @"\D+").Value).Key] = int.Parse(Regex.Match(label, @"\d+").Value);
+        }
+
+        public static void AddFixedCode(StringBuilder sb)
+        {
+            sb.AppendLine("");
+
+            sb.AppendLine(".start")
+                .AppendLine("prep main")
+                .AppendLine("call 0")
+                .AppendLine("halt");
+
+            sb.AppendLine("");
+
+            sb.AppendLine($@".addrof")
+                .AppendLine("get -1")
+                .AppendLine("get 0")
+                .AppendLine("sub")
+                .AppendLine("push 1")
+                .AppendLine("sub")
+                .AppendLine("ret");
         }
     }
 }

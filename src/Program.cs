@@ -52,6 +52,7 @@ namespace CompilerC__.src
                 #endregion Parse arguments
 
                 #region Compile
+                
                 CodeGenerator codeGenerator = new();
                 StringBuilder assemblyCode = new();
 
@@ -96,6 +97,8 @@ namespace CompilerC__.src
 
                 #endregion Test
 
+                CodeGenerator.AddFixedCode(assemblyCode);
+
                 #endregion Compile
 
                 #region Print assembly code
@@ -104,6 +107,17 @@ namespace CompilerC__.src
                 Console.WriteLine(assemblyCode);
 
                 #endregion Print assembly code
+
+                #region Execute with simulator
+
+                if (Utils.withSimulator)
+                {
+                    string code = assemblyCode.ToString();
+                    LaunchMake(code);
+                    LaunchSimulator(code);
+                }
+
+                #endregion Execute with simulator
 
             }
             catch (Exception e)
@@ -137,48 +151,8 @@ namespace CompilerC__.src
 
                 Console.WriteLine($"End compiling {fileName}\n");
 
-                if (Utils.withSimulator)
-                {
-                    LaunchMake(sb.ToString());
-                    LaunchSimulator(fileName);
-                }
-
                 Console.WriteLine("----------------------------------------------------------------------------------------------------");
             }
-        }
-
-        public static void LaunchSimulator(string fileName)
-        {
-
-            string tempFile = Path.GetTempFileName();
-            string simulatorPath = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "msm");
-            string logFile = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log", $"{fileName}.txt");
-
-            // Create a new process and redirect the output to the log file
-            Process simulatorProcess = new()
-            {
-                StartInfo = new()
-                {
-                    FileName = Path.Combine(simulatorPath, "msm.exe"),
-                    Arguments = $"-d {tempFile}",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true
-                }
-            };
-
-            Console.WriteLine($" Execute simulator final command : {simulatorProcess.StartInfo.FileName} {simulatorProcess.StartInfo.Arguments}");
-
-            // Start the process
-            simulatorProcess.Start();
-            simulatorProcess.WaitForExit();
-
-            File.WriteAllText(logFile, simulatorProcess.StandardOutput.ReadToEnd() + simulatorProcess.StandardError.ReadToEnd());
-            File.Delete(tempFile);
-
-            // Print the log file path
-            Console.WriteLine($"\nLog file: {logFile}");
         }
 
         public static void LaunchMake(string assemblyCode)
@@ -218,6 +192,55 @@ namespace CompilerC__.src
                 Utils.PrintError("make_failed", false, makeProcess.StandardError.ReadToEnd());
                 return;
             }
+        }
+
+        public static void LaunchSimulator(string assemblyCode)
+        {
+
+            string tempFile = Path.GetTempFileName();
+            string simulatorPath = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "msm");
+            string logFile = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log", $"log.txt");
+
+            // Create a new process and redirect the output to the log file
+            Process simulatorProcess = new()
+            {
+                StartInfo = new()
+                {
+                    FileName = Path.Combine(simulatorPath, "msm.exe"),
+                    Arguments = $"-d {tempFile}",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    RedirectStandardInput = true,
+                    CreateNoWindow = true
+                }
+            };
+
+            Console.WriteLine($" Execute simulator final command : {simulatorProcess.StartInfo.FileName} {simulatorProcess.StartInfo.Arguments}");
+
+            // Start the process
+            simulatorProcess.Start();
+            simulatorProcess.WaitForExit();
+
+            File.WriteAllText(logFile, FormatLog(assemblyCode, simulatorProcess.StandardOutput.ReadToEnd(), simulatorProcess.StandardError.ReadToEnd()));
+            File.Delete(tempFile);
+
+            // Print the log file path
+            Console.WriteLine($"\nLog file: {logFile}");
+        }
+
+        private static string FormatLog(string entry, string output, string error)
+        {
+            StringBuilder sb = new();
+
+            sb.AppendLine("------------------------------------------entry----------------------------------------------------------");
+            sb.AppendLine(entry);
+            sb.AppendLine("------------------------------------------output---------------------------------------------------------");
+            sb.AppendLine(output);
+            sb.AppendLine("------------------------------------------error----------------------------------------------------------");
+            sb.AppendLine(error);
+
+            return sb.ToString();
         }
 
         #endregion Compilation Pipeline
