@@ -30,8 +30,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="simulator\msm\msm\._msm.txt" />
-    <Content Include="simulator\msm\msm\msm.txt" />
+    <Compile Remove="simulator\msm\msm\**" />
+    <ContentWithTargetPath Remove="simulator\msm\msm\**" />
+    <EmbeddedResource Remove="simulator\msm\msm\**" />
+    <None Remove="simulator\msm\msm\**" />
   </ItemGroup>
 
   <ItemGroup>

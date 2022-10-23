@@ -56,6 +56,9 @@ namespace CompilerC__.src
                 CodeGenerator codeGenerator = new();
                 StringBuilder assemblyCode = new();
 
+                CodeGenerator.AddFixedCode(assemblyCode);
+
+
                 #region Runtime
 
                 Console.WriteLine("\nStart runtime compilation");
@@ -97,7 +100,6 @@ namespace CompilerC__.src
 
                 #endregion Test
 
-                CodeGenerator.AddFixedCode(assemblyCode);
 
                 #endregion Compile
 
@@ -207,7 +209,7 @@ namespace CompilerC__.src
                 StartInfo = new()
                 {
                     FileName = Path.Combine(simulatorPath, "msm.exe"),
-                    Arguments = $"-d {tempFile}",
+                    Arguments = $"{tempFile}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
