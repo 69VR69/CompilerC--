@@ -24,7 +24,8 @@ namespace CompilerC__.src
         public static List<CompilerException> exceptions = new()
         {
             new CompilerException("unknow_error","An exception was trown, error message : {0}"),
-            new CompilerException("make_failed","The make of the simulator failed with exception : {0}"),
+            new CompilerException("make_failed","The make of the simulator failed with exception :\n{0}"),
+            new CompilerException("simulator_failed","The execution of the simulator failed with exception :\n{0}"),
             new CompilerException("invalid_argument","You need to use a correct command syntax like : programName fileName.c <--debug> or programName . <--test> for unit tests"),
             
             // File exceptions

@@ -52,12 +52,9 @@ namespace CompilerC__.src
                 #endregion Parse arguments
 
                 #region Compile
-                
+
                 CodeGenerator codeGenerator = new();
                 StringBuilder assemblyCode = new();
-
-                CodeGenerator.AddFixedCode(assemblyCode);
-
 
                 #region Runtime
 
@@ -65,7 +62,7 @@ namespace CompilerC__.src
 
                 string runtimePath = Path.Combine(Directory.GetCurrentDirectory(), "runtime");
 
-                LaunchCompilation(runtimePath, assemblyCode, true);
+                LaunchCompilation(runtimePath, assemblyCode, codeGenerator, true);
 
                 Console.WriteLine("End runtime compilation\n");
 
@@ -77,7 +74,7 @@ namespace CompilerC__.src
                 {
                     Console.WriteLine("\nStart source compilation");
 
-                    LaunchCompilation(filePath, assemblyCode, false);
+                    LaunchCompilation(filePath, assemblyCode, codeGenerator, false);
 
                     Console.WriteLine("End source compilation\n");
                 }
@@ -93,13 +90,14 @@ namespace CompilerC__.src
                     string testPath = Path.Combine(Directory.GetCurrentDirectory(), "test");
                     Utils.debugMode = false;
 
-                    LaunchCompilation(testPath, new(), true);
+                    LaunchCompilation(testPath, new(), codeGenerator ,true);
 
                     Console.WriteLine("End test compilation\n");
                 }
 
                 #endregion Test
 
+                CodeGenerator.AddFixedCode(assemblyCode);
 
                 #endregion Compile
 
@@ -114,9 +112,8 @@ namespace CompilerC__.src
 
                 if (Utils.withSimulator)
                 {
-                    string code = assemblyCode.ToString();
-                    LaunchMake(code);
-                    LaunchSimulator(code);
+                    LaunchMake();
+                    LaunchSimulator(assemblyCode.ToString());
                 }
 
                 #endregion Execute with simulator
@@ -129,7 +126,7 @@ namespace CompilerC__.src
         }
 
         #region Compilation Pipeline
-        public static void LaunchCompilation(string path, StringBuilder sb, bool isDirectory = false)
+        public static void LaunchCompilation(string path, StringBuilder sb, CodeGenerator codeGenerator, bool isDirectory = false)
         {
             if (isDirectory)
             {
@@ -137,7 +134,7 @@ namespace CompilerC__.src
 
                 foreach (string filepath in filepaths)
                 {
-                    LaunchCompilation(filepath, sb, false);
+                    LaunchCompilation(filepath, sb, codeGenerator, false);
                 }
             }
             else
@@ -147,7 +144,7 @@ namespace CompilerC__.src
                 Console.WriteLine("----------------------------------------------------------------------------------------------------");
                 Console.WriteLine($"\nStart compiling {fileName}");
 
-                CodeGenerator codeGenerator = new();
+                codeGenerator = new();
                 codeGenerator.AddFileToLexical(Utils.LoadFileFromPath(path));
                 sb.AppendLine(codeGenerator.GenerateCode(fileName));
 
@@ -157,16 +154,9 @@ namespace CompilerC__.src
             }
         }
 
-        public static void LaunchMake(string assemblyCode)
+        public static void LaunchMake()
         {
-            string tempFile = Path.GetTempFileName();
             string simulatorPath = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "msm");
-
-            // Write the assembly code in the temporary file
-            File.WriteAllText(tempFile, assemblyCode);
-
-            // Create the directory log
-            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log"));
 
             string cygwinPath = "C:\\cygwin64\\bin\\bash";
 
@@ -203,6 +193,12 @@ namespace CompilerC__.src
             string simulatorPath = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "msm");
             string logFile = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log", $"log.txt");
 
+            // Write the assembly code in the temporary file
+            File.WriteAllText(tempFile, assemblyCode);
+
+            // Create the directory log
+            Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log"));
+
             // Create a new process and redirect the output to the log file
             Process simulatorProcess = new()
             {
@@ -224,7 +220,16 @@ namespace CompilerC__.src
             simulatorProcess.Start();
             simulatorProcess.WaitForExit();
 
-            File.WriteAllText(logFile, FormatLog(assemblyCode, simulatorProcess.StandardOutput.ReadToEnd(), simulatorProcess.StandardError.ReadToEnd()));
+            string outputStd = simulatorProcess.StandardOutput.ReadToEnd();
+            string errorStd = simulatorProcess.StandardError.ReadToEnd();
+
+            // Print error if the process failed
+            if (simulatorProcess.ExitCode != 0)
+            {
+                Utils.PrintError("simulator_failed", false, errorStd);
+            }
+
+            File.WriteAllText(logFile, FormatLog(assemblyCode, outputStd, errorStd));
             File.Delete(tempFile);
 
             // Print the log file path
