@@ -102,9 +102,12 @@ namespace CompilerC__.src
                 #endregion Compile
 
                 #region Print assembly code
-
-                Console.WriteLine("\nAssembly code:");
-                Console.WriteLine(assemblyCode);
+                
+                if (Utils.debugMode)
+                {
+                    Console.WriteLine("\nAssembly code:");
+                    Console.WriteLine(assemblyCode);
+                }
 
                 #endregion Print assembly code
 

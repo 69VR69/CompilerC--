@@ -82,9 +82,9 @@ namespace CompilerC__.src
 
             // Print or raise exception
             if (isBlocking)
-                throw new Exception(message);
+                throw new Exception($"\n{message}");
 
-            Console.Error.WriteLine(message);
+            Console.Error.WriteLine($"\n{message}");
 
         }
 
