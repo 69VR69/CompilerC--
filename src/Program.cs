@@ -54,7 +54,8 @@ namespace CompilerC__.src
                 #region Compile
 
                 CodeGenerator codeGenerator = new();
-                StringBuilder assemblyCode = new();
+                StringBuilder runtimeCode = new();
+                Dictionary<string, StringBuilder> assemblyCodes = new();
 
                 #region Runtime
 
@@ -62,11 +63,13 @@ namespace CompilerC__.src
 
                 string runtimePath = Path.Combine(Directory.GetCurrentDirectory(), "runtime");
 
-                LaunchCompilation(runtimePath, assemblyCode, codeGenerator, true);
+                LaunchCompilation(runtimePath, runtimeCode, codeGenerator, true);
 
                 Console.WriteLine("End runtime compilation\n");
 
                 #endregion Runtime
+
+                CodeGenerator.AddFixedCode(runtimeCode);
 
                 #region Source
 
@@ -74,7 +77,11 @@ namespace CompilerC__.src
                 {
                     Console.WriteLine("\nStart source compilation");
 
-                    LaunchCompilation(filePath, assemblyCode, codeGenerator, false);
+                    foreach (KeyValuePair<string, StringBuilder> assembly_code in LaunchCompilation(filePath, new StringBuilder(), codeGenerator, false))
+                    {
+                        assemblyCodes.Add(assembly_code.Key, assembly_code.Value);
+
+                    }
 
                     Console.WriteLine("End source compilation\n");
                 }
@@ -90,23 +97,44 @@ namespace CompilerC__.src
                     string testPath = Path.Combine(Directory.GetCurrentDirectory(), "test");
                     Utils.debugMode = false;
 
-                    LaunchCompilation(testPath, new(), codeGenerator ,true);
+                    foreach (var t in LaunchCompilation(testPath, new StringBuilder(), codeGenerator, true))
+                    {
+                        assemblyCodes.Add(t.Key, t.Value);
+                    }
 
                     Console.WriteLine("End test compilation\n");
                 }
 
                 #endregion Test
 
-                CodeGenerator.AddFixedCode(assemblyCode);
+                #region Merge assemblyCode
+
+                Dictionary<string, StringBuilder> temp = new();
+
+                foreach (KeyValuePair<string, StringBuilder> assemblyCode in assemblyCodes)
+                {
+                    StringBuilder runtimeTemp = runtimeCode;
+                    string key = assemblyCode.Key;
+                    string value = assemblyCode.Value.ToString();
+
+                    temp[key] = runtimeTemp.AppendLine(value); //TODO: Fix this
+                }
+
+                assemblyCodes = temp;
+
+                #endregion Merge assemblyCode
 
                 #endregion Compile
 
                 #region Print assembly code
-                
+
                 if (Utils.debugMode)
                 {
-                    Console.WriteLine("\nAssembly code:");
-                    Console.WriteLine(assemblyCode);
+                    foreach (KeyValuePair<string, StringBuilder> assemblyCode in assemblyCodes)
+                    {
+                        Console.WriteLine($"\n{assemblyCode.Key}'s assembly code:\n");
+                        Console.WriteLine(assemblyCode.Value);
+                    }
                 }
 
                 #endregion Print assembly code
@@ -116,7 +144,12 @@ namespace CompilerC__.src
                 if (Utils.withSimulator)
                 {
                     LaunchMake();
-                    LaunchSimulator(assemblyCode.ToString());
+                    foreach (KeyValuePair<string, StringBuilder> assemblyCode in assemblyCodes)
+                    {
+                        Console.WriteLine($"\n{assemblyCode.Key}'s execution:");
+                        LaunchSimulator(assemblyCode);
+                        Console.WriteLine("----------------------------------------------------------------------------------------------------");
+                    }
                 }
 
                 #endregion Execute with simulator
@@ -129,7 +162,19 @@ namespace CompilerC__.src
         }
 
         #region Compilation Pipeline
-        public static void LaunchCompilation(string path, StringBuilder sb, CodeGenerator codeGenerator, bool isDirectory = false)
+        public static Dictionary<string, StringBuilder> LaunchCompilation(string path, StringBuilder sb, CodeGenerator codeGenerator, bool isDirectory = false, bool isJoined = false)
+        {
+            Dictionary<string, StringBuilder> assemblyCodes = new();
+
+            if (isJoined)
+            {
+                assemblyCodes.Add(Path.GetFileName(path), sb);
+            }
+
+            return LaunchCompilation(path, assemblyCodes, codeGenerator, isDirectory, isJoined);
+        }
+
+        public static Dictionary<string, StringBuilder> LaunchCompilation(string path, Dictionary<string, StringBuilder> sbs, CodeGenerator codeGenerator, bool isDirectory = false, bool isJoined = false)
         {
             if (isDirectory)
             {
@@ -137,7 +182,7 @@ namespace CompilerC__.src
 
                 foreach (string filepath in filepaths)
                 {
-                    LaunchCompilation(filepath, sb, codeGenerator, false);
+                    LaunchCompilation(filepath, sbs, codeGenerator, false, isJoined);
                 }
             }
             else
@@ -149,12 +194,20 @@ namespace CompilerC__.src
 
                 codeGenerator = new();
                 codeGenerator.AddFileToLexical(Utils.LoadFileFromPath(path));
-                sb.AppendLine(codeGenerator.GenerateCode(fileName));
+
+                if (isJoined)
+                {
+                    sbs.First().Value.AppendLine(codeGenerator.GenerateCode(fileName));
+                }
+                else
+                    sbs.Add(fileName, new StringBuilder(codeGenerator.GenerateCode(fileName)));
 
                 Console.WriteLine($"End compiling {fileName}\n");
 
                 Console.WriteLine("----------------------------------------------------------------------------------------------------");
             }
+
+            return sbs;
         }
 
         public static void LaunchMake()
@@ -177,7 +230,8 @@ namespace CompilerC__.src
                 }
             };
 
-            Console.WriteLine($" Execute make final command : {makeProcess.StartInfo.FileName} {makeProcess.StartInfo.Arguments}");
+            if (Utils.debugMode)
+                Console.WriteLine($" Execute make final command : {makeProcess.StartInfo.FileName} {makeProcess.StartInfo.Arguments}");
 
             makeProcess.Start();
             makeProcess.WaitForExit();
@@ -189,15 +243,15 @@ namespace CompilerC__.src
             }
         }
 
-        public static void LaunchSimulator(string assemblyCode)
+        public static void LaunchSimulator(KeyValuePair<string, StringBuilder> assemblyCode)
         {
 
             string tempFile = Path.GetTempFileName();
             string simulatorPath = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "msm");
-            string logFile = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log", $"log.txt");
+            string logFile = Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log", $"log_{assemblyCode.Key}.txt");
 
             // Write the assembly code in the temporary file
-            File.WriteAllText(tempFile, assemblyCode);
+            File.WriteAllText(tempFile, assemblyCode.Value.ToString());
 
             // Create the directory log
             Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "simulator", "log"));
@@ -217,7 +271,8 @@ namespace CompilerC__.src
                 }
             };
 
-            Console.WriteLine($" Execute simulator final command : {simulatorProcess.StartInfo.FileName} {simulatorProcess.StartInfo.Arguments}");
+            if (Utils.debugMode)
+                Console.WriteLine($" Execute simulator final command : {simulatorProcess.StartInfo.FileName} {simulatorProcess.StartInfo.Arguments}");
 
             // Start the process
             simulatorProcess.Start();
@@ -232,7 +287,7 @@ namespace CompilerC__.src
                 Utils.PrintError("simulator_failed", false, errorStd);
             }
 
-            File.WriteAllText(logFile, FormatLog(assemblyCode, outputStd, errorStd));
+            File.WriteAllText(logFile, FormatLog(assemblyCode.Value.ToString(), outputStd, errorStd));
             File.Delete(tempFile);
 
             // Print the log file path
