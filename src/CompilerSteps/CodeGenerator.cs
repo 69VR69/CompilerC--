@@ -312,6 +312,7 @@ namespace CompilerC__.CompilerSteps
             sb.AppendLine(".start")
                 .AppendLine("prep main")
                 .AppendLine("call 0")
+                .AppendLine("dbg")
                 .AppendLine("halt");
 
             sb.AppendLine("");

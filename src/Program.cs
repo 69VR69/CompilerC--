@@ -113,11 +113,11 @@ namespace CompilerC__.src
 
                 foreach (KeyValuePair<string, StringBuilder> assemblyCode in assemblyCodes)
                 {
-                    StringBuilder runtimeTemp = runtimeCode;
+                    StringBuilder runtimeTemp = new(runtimeCode.ToString());
                     string key = assemblyCode.Key;
                     string value = assemblyCode.Value.ToString();
 
-                    temp[key] = runtimeTemp.AppendLine(value); //TODO: Fix this
+                    temp.Add(key, new(runtimeTemp.AppendLine(value).ToString()));
                 }
 
                 assemblyCodes = temp;
@@ -262,7 +262,7 @@ namespace CompilerC__.src
                 StartInfo = new()
                 {
                     FileName = Path.Combine(simulatorPath, "msm.exe"),
-                    Arguments = $"{tempFile}",
+                    Arguments = $"-d {tempFile}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
