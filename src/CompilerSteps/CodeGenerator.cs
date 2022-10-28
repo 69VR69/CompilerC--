@@ -121,6 +121,12 @@ namespace CompilerC__.CompilerSteps
                     }
                     break;
 
+                case "mult":
+                    GenerateNodeCode(root.Childs[0], sb);
+                    GenerateNodeCode(root.Childs[1], sb);
+                    sb.AppendLine("mul");
+                    break;
+
                 ////////////////////////////////////////////////////////////////
 
                 case "cond":

@@ -144,11 +144,27 @@ namespace CompilerC__.src
                 if (Utils.withSimulator)
                 {
                     LaunchMake();
+
+                    List<string> fileWithError = new();
                     foreach (KeyValuePair<string, StringBuilder> assemblyCode in assemblyCodes)
                     {
                         Console.WriteLine($"\n{assemblyCode.Key}'s execution:");
-                        LaunchSimulator(assemblyCode);
+                        int exitCode = LaunchSimulator(assemblyCode);
                         Console.WriteLine("----------------------------------------------------------------------------------------------------");
+
+                        if (exitCode != 0)
+                        {
+                            fileWithError.Add(assemblyCode.Key);
+                        }
+                    }
+
+                    if (fileWithError.Count > 0)
+                    {
+                        Console.WriteLine("\nFiles with error:");
+                        foreach (string file in fileWithError)
+                        {
+                            Console.WriteLine(file);
+                        }
                     }
                 }
 
@@ -243,7 +259,7 @@ namespace CompilerC__.src
             }
         }
 
-        public static void LaunchSimulator(KeyValuePair<string, StringBuilder> assemblyCode)
+        public static int LaunchSimulator(KeyValuePair<string, StringBuilder> assemblyCode)
         {
 
             string tempFile = Path.GetTempFileName();
@@ -262,7 +278,7 @@ namespace CompilerC__.src
                 StartInfo = new()
                 {
                     FileName = Path.Combine(simulatorPath, "msm.exe"),
-                    Arguments = $"-d {tempFile}",
+                    Arguments = $"-d -m {tempFile}",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -280,9 +296,10 @@ namespace CompilerC__.src
 
             string outputStd = simulatorProcess.StandardOutput.ReadToEnd();
             string errorStd = simulatorProcess.StandardError.ReadToEnd();
+            int exitCode = simulatorProcess.ExitCode;
 
             // Print error if the process failed
-            if (simulatorProcess.ExitCode != 0)
+            if (exitCode != 0)
             {
                 Utils.PrintError("simulator_failed", false, errorStd);
             }
@@ -292,6 +309,8 @@ namespace CompilerC__.src
 
             // Print the log file path
             Console.WriteLine($"\nLog file: {logFile}");
+
+            return exitCode;
         }
 
         private static string FormatLog(string entry, string output, string error)
