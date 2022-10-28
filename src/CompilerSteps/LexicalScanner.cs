@@ -145,7 +145,7 @@ namespace CompilerC__.CompilerSteps
 
                         if (ignored.Any(i => i.Code == c.Code))
                         {
-                            tokens.RemoveRange(startIndex, tokens.Count);
+                            tokens.RemoveRange(startIndex, tokens.Count - startIndex);
                             break;
                         }
                     }
