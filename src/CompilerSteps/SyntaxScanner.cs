@@ -314,6 +314,7 @@ namespace CompilerC__.CompilerSteps
                     break;
 
                 LexicalScanner.NextToken();
+
                 prefixNode = new Node(op.NodeType?.Code, prefixNode, Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0)));
             }
 

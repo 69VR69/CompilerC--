@@ -4,9 +4,10 @@
 	a=a;
 	int b;
 	int bu;
-	//int b2;
+	int b2;
 	b = bu = a;
-	//b2 = b = a + a = bu;
+	b2 = b = a = bu;
 	int c;
-	c= a ;//<0; && b>2 || 3 !=2;
+	//c = 5 < 1 || 2;
+	//c= a <0 && b>2 || 3 !=2;
 }

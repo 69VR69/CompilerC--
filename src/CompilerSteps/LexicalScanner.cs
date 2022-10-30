@@ -21,7 +21,7 @@ namespace CompilerC__.CompilerSteps
 
         private readonly char[] spacesDelemiter = Utils.tokenTypes.Where(t => t.Code == "space" && t.MatchedCharacters != null).SelectMany(t => t.MatchedCharacters).ToArray();
         private readonly TokenType[] ignored = Utils.GetTokenType("comment", "preproc");
-        private readonly TokenType[] tokenTypes = Utils.tokenTypes.Where(t => t.Code != "space" && t.Code != "comment" && t.Code != "preproc" && t.Code != "pipe").Select(t => t).ToArray();
+        private readonly TokenType[] tokenTypes = Utils.tokenTypes.Where(t => t.Code != "space" && t.Code != "comment" && t.Code != "preproc").Select(t => t).ToArray();
 
         public LexicalScanner()
         {

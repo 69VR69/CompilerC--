@@ -98,7 +98,7 @@ namespace CompilerC__.src
         {
             new TokenType("eos",0, regex: "eos" ),
             new TokenType("const", 0,regex: "\\d+" ),
-            new TokenType("ident", 5,regex: "[a-zA-Z]+" ),
+            new TokenType("ident", 5,regex: "[a-zA-Z]\\w*" ),
             new TokenType("space",0, ' ','\t'),
             new TokenType("newLine", 0,'\n','\r'),
             new TokenType("preproc",0, '#'),
