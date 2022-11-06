@@ -306,16 +306,17 @@ namespace CompilerC__.CompilerSteps
         private Node Execute(int pmin = 0)
         {
             Node prefixNode = Prefixe();
-            Operation? op;
 
-            while ((op = Utils.GetOperation(LexicalScanner?.Current?.Type)) != null)
+            while (Utils.IsOperation(LexicalScanner?.Current?.Type))
             {
-                if (op.Priority < pmin)
+                Operation? op = Utils.GetOperation(LexicalScanner?.Current?.Type);
+
+                if (op == null || op.Priority < pmin)
                     break;
 
                 LexicalScanner.NextToken();
 
-                prefixNode = new Node(op.NodeType?.Code, prefixNode, Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0)));
+                prefixNode = new(op.NodeType?.Code, prefixNode, Execute(op.Priority + (op.IsLeftAssociate ? 1 : 0)));
             }
 
             return prefixNode;

@@ -82,11 +82,11 @@ namespace CompilerC__.CompilerSteps
                         foundToken.Add(new Token(tokenType, tokenValue, CurrentLine));
                 }
             }
+            
+            foundToken = MergeComposedTokens(foundToken);
 
             if (foundToken != null && foundToken.Count > 0)
             {
-                MergeComposedTokens(foundToken);
-
                 if (Utils.debugMode)
                     Console.WriteLine($"token found : {foundToken.Select(t => t.Type).Aggregate((a, b) => $"{a} {b}")}\n");
 
@@ -120,12 +120,15 @@ namespace CompilerC__.CompilerSteps
 
             return fileLine;
         }
-        private void MergeComposedTokens(List<Token> tokens)
+        private List<Token> MergeComposedTokens(List<Token> tokens)
         {
             List<TokenType>? composedTokens = Utils.tokenTypes
                 .Where(t => typeof(ComposedTokenType) == t.GetType())
                 .OrderByDescending(t => t.Order)
                 .ToList();
+
+            if(tokens?.Count < 0)
+                return tokens;
 
             foreach (ComposedTokenType c in composedTokens.Cast<ComposedTokenType>())
             {
@@ -153,6 +156,8 @@ namespace CompilerC__.CompilerSteps
                         break;
                 }
             }
+
+            return tokens;
         }
 
         private static bool CheckFollowMatchs(List<Token> tokens, List<TokenType> tokenList, int index, out int lastIndex)

@@ -249,6 +249,11 @@ namespace CompilerC__.src
             });
         }
 
+        public static bool IsOperation(string tokenType)
+        {
+            return operations.Exists(o => o.TokenType.Code == tokenType);
+        }
+
         public static Operation? GetOperation(string tokenType)
         {
             Operation? o = operations.Find(o => o.TokenType.Code == tokenType);
