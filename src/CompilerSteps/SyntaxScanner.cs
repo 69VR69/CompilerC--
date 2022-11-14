@@ -196,7 +196,7 @@ namespace CompilerC__.CompilerSteps
             {
                 Node e = Expression();
                 Accept("semicolon");
-                return new Node(e);
+                return new Node(e, new Node("semicolon"));
             }
 
         }

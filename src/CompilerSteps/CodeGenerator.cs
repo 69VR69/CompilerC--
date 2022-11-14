@@ -105,6 +105,10 @@ namespace CompilerC__.CompilerSteps
                     sb.AppendLine($"call 1");
                     break;
 
+                case "semicolon":
+                    sb.AppendLine("drop");
+                    break;
+
                 case "assign":
                     if (root.Childs[0].Type == "ident")
                     {
@@ -119,12 +123,6 @@ namespace CompilerC__.CompilerSteps
                         GenerateNodeCode(root.Childs[0].Childs[0], sb);
                         sb.AppendLine("write");
                     }
-                    break;
-
-                case "mult":
-                    GenerateNodeCode(root.Childs[0], sb);
-                    GenerateNodeCode(root.Childs[1], sb);
-                    sb.AppendLine("mul");
                     break;
 
                 ////////////////////////////////////////////////////////////////
@@ -181,6 +179,12 @@ namespace CompilerC__.CompilerSteps
                 case "notequal":
                     GenerateCodeForChilds(root, sb);
                     sb.AppendLine("cmpne");
+                    break;
+
+                case "mult":
+                    GenerateNodeCode(root.Childs[0], sb);
+                    GenerateNodeCode(root.Childs[1], sb);
+                    sb.AppendLine("mul");
                     break;
 
                 ////////////////////////////////////////////////////////////////
