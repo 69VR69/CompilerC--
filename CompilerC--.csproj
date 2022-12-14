@@ -31,9 +31,13 @@
 
   <ItemGroup>
     <Compile Remove="simulator\msm\msm\**" />
+    <Compile Remove="test\Variables\**" />
     <ContentWithTargetPath Remove="simulator\msm\msm\**" />
+    <ContentWithTargetPath Remove="test\Variables\**" />
     <EmbeddedResource Remove="simulator\msm\msm\**" />
+    <EmbeddedResource Remove="test\Variables\**" />
     <None Remove="simulator\msm\msm\**" />
+    <None Remove="test\Variables\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,10 +45,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <TargetPath>%(Filename)%(Extension)</TargetPath>
     </ContentWithTargetPath>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="test\Variables\" />
   </ItemGroup>
 
 </Project>

@@ -195,6 +195,7 @@ namespace CompilerC__.CompilerSteps
 
                 case "loop":
                     string tempLblbBreak = GetNewLabel("break", post: true);
+                    string tempLblbContinue = GetNewLabel("continue", post: true);
                     string looplabel = GetNewLabel("loop");
 
                     sb.AppendLine($"\t; start of loop n°{LabelCounter["loop"]}");
@@ -210,6 +211,7 @@ namespace CompilerC__.CompilerSteps
                     sb.AppendLine($"\t; end of loop n°{LabelCounter["loop"]}");
 
                     SetLabelCounter(tempLblbBreak);
+                    SetLabelCounter(tempLblbContinue);
                     break;
 
                 case "continue":
@@ -217,7 +219,7 @@ namespace CompilerC__.CompilerSteps
                     break;
 
                 case "continueLabel":
-                    sb.AppendLine($".{GetNewLabel("continue")}");
+                    sb.AppendLine($".{GetLabel("continue")}");
                     break;
 
                 ////////////////////////////////////////////////////////////////

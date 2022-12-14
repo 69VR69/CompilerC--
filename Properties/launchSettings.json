@@ -2,7 +2,7 @@
   "profiles": {
     "CompilerC--": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\document\\Projet_cours\\CompilerC--\\test\\Variables\\var_declaration_4.c\"\r\n--simulator\r\n--debug"
+      "commandLineArgs": "\"D:\\afouq\\documents\\Projets_cours\\CompilerC--\\test\\Loop\\loop_continue_3.c\"\r\n--simulator\r\n--debug"
     }
   }
 }
