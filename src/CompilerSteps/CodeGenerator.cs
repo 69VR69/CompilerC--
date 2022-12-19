@@ -131,7 +131,7 @@ namespace CompilerC__.CompilerSteps
                     string ifLabel = GetNewLabel("if");
                     string elseLabel = GetNewLabel("else");
 
-                    sb.AppendLine($"\t; start of cond n°{LabelCounter["if"]}");
+                    sb.AppendLine($"\t; start of cond n°{GetLabelCounter(ifLabel)}");
 
                     GenerateNodeCode(root.Childs[0], sb); //condition
 
@@ -147,7 +147,7 @@ namespace CompilerC__.CompilerSteps
 
                     sb.AppendLine($".{ifLabel}");
 
-                    sb.AppendLine($"\t; end of cond n°{LabelCounter["if"]}");
+                    sb.AppendLine($"\t; end of cond n°{GetLabelCounter(ifLabel)}");
 
                     break;
 
@@ -198,7 +198,7 @@ namespace CompilerC__.CompilerSteps
                     string tempLblbContinue = GetNewLabel("continue", post: true);
                     string looplabel = GetNewLabel("loop");
 
-                    sb.AppendLine($"\t; start of loop n°{LabelCounter["loop"]}");
+                    sb.AppendLine($"\t; start of loop n°{GetLabelCounter(looplabel)}");
 
                     sb.AppendLine($".{looplabel}");
 
@@ -208,7 +208,7 @@ namespace CompilerC__.CompilerSteps
                     sb.AppendLine($".lb{LabelCounter["break"]}");
 
 
-                    sb.AppendLine($"\t; end of loop n°{LabelCounter["loop"]}");
+                    sb.AppendLine($"\t; end of loop n°{GetLabelCounter(looplabel)}");
 
                     SetLabelCounter(tempLblbBreak);
                     SetLabelCounter(tempLblbContinue);
@@ -311,6 +311,12 @@ namespace CompilerC__.CompilerSteps
         private static string GetNewLabel(string label, bool post = false)
         {
             return Labels[label] + (post ? LabelCounter[label]++ : ++LabelCounter[label]);
+        }
+
+        private static int GetLabelCounter(string label)
+        {
+            //label in form "lb1"
+            return int.Parse(label.Substring(2));
         }
         private static void SetLabelCounter(string label)
         {
