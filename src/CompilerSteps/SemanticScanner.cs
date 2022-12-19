@@ -77,8 +77,11 @@ namespace CompilerC__.CompilerSteps
                     if (s == null)
                         Utils.PrintError("function_not_found", true, n.Value);
 
-                    if (s.NbParam != n.Childs.Count)
+                    if (s?.NbParam != (n.Childs.Where(x => x.Type != "semicolon").Count()))
                         Utils.PrintError("wrong_number_of_parameters", true, n.Value);
+
+                    foreach (Node c in n.Childs)
+                        SemNode(c);
 
                     break;
 

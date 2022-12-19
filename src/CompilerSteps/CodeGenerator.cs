@@ -237,7 +237,7 @@ namespace CompilerC__.CompilerSteps
 
                 case "call":
                     sb.AppendLine($"prep {root.Value}");
-                    int nbParams = root.Childs.Count;
+                    int nbParams = root.Childs.Where(x => x.Type == "ident" || x.Type == "const").Count();
                     GenerateCodeForChilds(root, sb);
                     sb.AppendLine($"call {nbParams}");
                     break;
