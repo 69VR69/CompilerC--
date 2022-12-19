@@ -3,6 +3,8 @@ using System.Text;
 
 using CompilerC__.CompilerSteps;
 
+// TODO : Fix infinite loop on "imbriqué" + fix all tests bug + write manual + improve testing of runtime
+
 namespace CompilerC__.src
 {
     internal class Program
