@@ -20,8 +20,8 @@ namespace CompilerC__.CompilerSteps
         public int CurrentLine { get; set; }
 
         private readonly char[] spacesDelemiter = Utils.tokenTypes.Where(t => t.Code == "space" && t.MatchedCharacters != null).SelectMany(t => t.MatchedCharacters).ToArray();
-        private readonly TokenType[] ignored = Utils.GetTokenType("comment", "preproc");
-        private readonly TokenType[] tokenTypes = Utils.tokenTypes.Where(t => t.Code != "space" && t.Code != "comment" && t.Code != "preproc").Select(t => t).ToArray();
+        private readonly TokenType[] ignored = Utils.GetTokenType(new string[] { "comment" });
+        private readonly TokenType[] tokenTypes = Utils.tokenTypes.Where(t => t.Code != "space" && t.Code != "comment").Select(t => t).ToArray();
 
         public LexicalScanner()
         {
@@ -82,7 +82,7 @@ namespace CompilerC__.CompilerSteps
                         foundToken.Add(new Token(tokenType, tokenValue, CurrentLine));
                 }
             }
-            
+
             foundToken = MergeComposedTokens(foundToken);
 
             if (foundToken != null && foundToken.Count > 0)
@@ -127,7 +127,7 @@ namespace CompilerC__.CompilerSteps
                 .OrderByDescending(t => t.Order)
                 .ToList();
 
-            if(tokens?.Count < 0)
+            if (tokens?.Count < 0)
                 return tokens;
 
             foreach (ComposedTokenType c in composedTokens.Cast<ComposedTokenType>())
@@ -141,6 +141,9 @@ namespace CompilerC__.CompilerSteps
                 while (lastIndex < tokens.Count)
                 {
                     int startIndex = FindFirstMatch(tokens, tokenList, lastIndex);
+                    if (tokens.Count < startIndex + tokenList.Count)
+                        break;
+
                     if (CheckFollowMatchs(tokens, tokenList, startIndex, out lastIndex))
                     {
                         tokens.RemoveRange(startIndex, lastIndex - startIndex);

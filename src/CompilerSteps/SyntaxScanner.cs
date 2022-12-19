@@ -2,6 +2,7 @@
 
 using CompilerC__.Objects;
 using CompilerC__.src;
+using CompilerC__.src.Objects;
 
 namespace CompilerC__.CompilerSteps
 {
@@ -20,12 +21,39 @@ namespace CompilerC__.CompilerSteps
             if (Utils.debugMode)
                 Console.WriteLine("\nSyntax scanning start !");
 
-            Node node = Function();
+            Node node = General();
 
             if (Utils.debugMode)
                 Console.WriteLine("Syntax scanning end !\n");
 
             return node;
+        }
+
+        private Node General()
+        {
+            // Check pattern #include <stdio.h>
+            if (Check("preproc"))
+            {
+                string preprocName = LexicalScanner.Current.Value;
+
+                if (preprocName == "include")
+                {
+                    LexicalScanner.NextToken();
+                    Accept("lowChevron");
+
+                    string libName = Path.GetFileNameWithoutExtension(LexicalScanner.Current.Value);
+                    int libLine = LexicalScanner.Current.Line;
+
+                    LexicalScanner.NextToken();
+                    Accept("upChevron");
+
+                    return new Node("lib", libName, libLine);
+                }
+
+                return new Node();
+            }
+            else
+                return Function();
         }
 
         private Node Function()

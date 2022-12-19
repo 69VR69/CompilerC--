@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 using CompilerC__.Objects;
 using CompilerC__.Objects.Types;
+using CompilerC__.src.Objects;
 
 namespace CompilerC__.src
 {
@@ -45,6 +46,7 @@ namespace CompilerC__.src
             
             // Semantic exceptions
             new CompilerException("unrecognized_symbol","Unrecognized symbol with the identification code '{0}' "),
+            new CompilerException("library_not_found","Library '{0}' not found"),
             new CompilerException("symbol_already_declared","A symbol with the identification code '{0}' is already declared in this scope"),
             new CompilerException("assign_to_non_var","Assignation to '{0}' is impossible as it's not a variable at line {1}"),
             new CompilerException("function_already_exist","Function '{0}' already declared"),
@@ -98,7 +100,7 @@ namespace CompilerC__.src
         {
             new TokenType("eos",0, regex: "eos" ),
             new TokenType("const", 0,regex: "\\d+" ),
-            new TokenType("ident", 5,regex: "[a-zA-Z]\\w*" ),
+            new TokenType("ident", 5,regex: "[a-zA-Z](\\w|\\.)*" ),
             new TokenType("space",0, ' ','\t'),
             new TokenType("newLine", 0,'\n','\r'),
             new TokenType("preproc",0, '#'),
@@ -201,6 +203,7 @@ namespace CompilerC__.src
             new ("seq"),
             new ("declaration"),
             new ("block"),
+            new ("lib"),
             new ("eos"),
         };
 
@@ -297,6 +300,24 @@ namespace CompilerC__.src
         }
 
         #endregion Operators
+
+        #region Library
+
+        public static List<Library> Libraries = new();
+        public static string currentLibrary = string.Empty;
+        public static bool runtimeMode = false;
+
+        public static Library GetLibrary(string libraryName)
+        {
+            Library? l = Libraries.Find(l => l.Name == libraryName);
+
+            if (l == null)
+                PrintError("unrecognized_library", true, libraryName);
+
+            return l;
+        }
+
+        #endregion Library
 
         #endregion Objects
 

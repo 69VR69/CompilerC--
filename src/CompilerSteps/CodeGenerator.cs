@@ -65,6 +65,9 @@ namespace CompilerC__.CompilerSteps
 
             } while (true);
 
+            // if is runtime compiling, add it to the library
+            if (Utils.runtimeMode == true)
+                Utils.Libraries.First(l => l.Name == Utils.currentLibrary).SymbolTable = SemanticScanner.SymbolTable.First();
 
             GeneratedCode = sb.ToString();
 
@@ -84,6 +87,10 @@ namespace CompilerC__.CompilerSteps
             switch (root.Type)
             {
                 case "declaration":
+                    break;
+
+                case "lib":
+                    sb.Append(Utils.GetLibrary(root.Value).AssemblyCode);
                     break;
 
                 case "const":

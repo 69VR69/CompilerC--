@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CompilerC__.Objects;
 using CompilerC__.Objects.Types;
 using CompilerC__.src;
+using CompilerC__.src.Objects;
 
 namespace CompilerC__.CompilerSteps
 {
@@ -35,7 +36,8 @@ namespace CompilerC__.CompilerSteps
             SemNode(n);
 
             // function node contain the number of variables in the function sub by number of parameters
-            n.Address = Utils.nbVar - n.Childs[0].Childs.Count;
+            if (n.Type != "lib")
+                n.Address = Utils.nbVar - n.Childs[0].Childs.Count;
 
             if (Utils.debugMode)
                 Console.WriteLine("Semantic scanning end !\n");
@@ -51,6 +53,13 @@ namespace CompilerC__.CompilerSteps
                 default:
                     foreach (Node c in n.Childs)
                         SemNode(c);
+                    break;
+
+                case "lib":
+
+                    foreach (var d in Utils.GetLibrary(n.Value).SymbolTable)
+                        SymbolTable.First().Add(d);
+
                     break;
 
                 case "function":

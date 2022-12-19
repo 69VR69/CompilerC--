@@ -63,7 +63,13 @@ namespace CompilerC__.src
 
                 string runtimePath = Path.Combine(Directory.GetCurrentDirectory(), "runtime");
 
+                Utils.runtimeMode = true;
+
                 LaunchCompilation(runtimePath, runtimeCode, codeGenerator, true);
+
+                var test = Utils.Libraries;
+
+                Utils.runtimeMode = false;
 
                 Console.WriteLine("End runtime compilation\n");
 
@@ -108,7 +114,6 @@ namespace CompilerC__.src
                 #endregion Test
 
                 #region Merge assemblyCode
-
                 Dictionary<string, StringBuilder> temp = new();
 
                 foreach (KeyValuePair<string, StringBuilder> assemblyCode in assemblyCodes)
@@ -210,6 +215,11 @@ namespace CompilerC__.src
 
                 codeGenerator = new();
                 codeGenerator.AddFileToLexical(Utils.LoadFileFromPath(path));
+                if (Utils.runtimeMode)
+                {
+                    Utils.Libraries.Add(new(fileName));
+                    Utils.currentLibrary = fileName;
+                }
 
                 if (isJoined)
                 {
@@ -217,6 +227,12 @@ namespace CompilerC__.src
                 }
                 else
                     sbs.Add(fileName, new StringBuilder(codeGenerator.GenerateCode(fileName)));
+
+                if (Utils.runtimeMode)
+                {
+                    Utils.Libraries.First(l => l.Name == fileName).AssemblyCode = sbs[fileName];
+                    Utils.currentLibrary = string.Empty;
+                }
 
                 Console.WriteLine($"End compiling {fileName}\n");
 
