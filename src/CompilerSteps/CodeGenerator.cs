@@ -100,7 +100,7 @@ namespace CompilerC__.CompilerSteps
                     break;
 
                 case "addrOf":
-                    sb.AppendLine($"prep .addrof");
+                    sb.AppendLine($"prep addrof");
                     sb.AppendLine($"push {Utils.nbVar}");
                     sb.AppendLine($"call 1");
                     break;
@@ -237,7 +237,7 @@ namespace CompilerC__.CompilerSteps
 
                 case "call":
                     sb.AppendLine($"prep {root.Value}");
-                    int nbParams = root.Childs.Where(x => x.Type == "ident" || x.Type == "const").Count();
+                    int nbParams = root.Childs.Where(x => x.Type != "semicolon").Count();
                     GenerateCodeForChilds(root, sb);
                     sb.AppendLine($"call {nbParams}");
                     break;

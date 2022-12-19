@@ -2,7 +2,7 @@
   "profiles": {
     "CompilerC--": {
       "commandName": "Project",
-      "commandLineArgs": "\"D:\\document\\Projet_cours\\CompilerC--\\test\\Function\\function_recursive_1.c\"\r\n--simulator\r\n--debug"
+      "commandLineArgs": "\"D:\\document\\Projet_cours\\CompilerC--\\test\\Pointers\\pointer_indexate_2.c\"\r\n--simulator\r\n--debug"
     }
   }
 }
