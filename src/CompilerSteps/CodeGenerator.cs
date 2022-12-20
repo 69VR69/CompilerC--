@@ -196,10 +196,6 @@ namespace CompilerC__.CompilerSteps
 
                 ////////////////////////////////////////////////////////////////
 
-                case "break":
-                    sb.AppendLine($"jump {GetLabel("break")}");
-                    break;
-
                 case "loop":
                     string tempLblbBreak = GetNewLabel("break", post: true);
                     string tempLblbContinue = GetNewLabel("continue", post: true);
@@ -212,13 +208,17 @@ namespace CompilerC__.CompilerSteps
                     GenerateCodeForChilds(root, sb);
 
                     sb.AppendLine($"jump {looplabel} ");
-                    sb.AppendLine($".lb{LabelCounter["break"]}");
+                    sb.AppendLine($".lb{GetLabelCounter(tempLblbBreak) + 1}");
 
 
                     sb.AppendLine($"\t; end of loop n°{GetLabelCounter(looplabel)}");
 
                     SetLabelCounter(tempLblbBreak);
                     SetLabelCounter(tempLblbContinue);
+                    break;
+
+                case "break":
+                    sb.AppendLine($"jump {GetLabel("break")}");
                     break;
 
                 case "continue":
@@ -322,7 +322,6 @@ namespace CompilerC__.CompilerSteps
 
         private static int GetLabelCounter(string label)
         {
-            //label in form "lb1"
             return int.Parse(label.Substring(2));
         }
         private static void SetLabelCounter(string label)
