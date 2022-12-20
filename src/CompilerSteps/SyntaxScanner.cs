@@ -224,6 +224,10 @@ namespace CompilerC__.CompilerSteps
             {
                 Node e = Expression();
                 Accept("semicolon");
+
+                if (e.Type == "call")
+                    return new Node(e, new Node("semicolon"));
+
                 e.Childs.Add(new Node("semicolon"));
                 return e;
             }

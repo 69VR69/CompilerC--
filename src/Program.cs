@@ -3,7 +3,7 @@ using System.Text;
 
 using CompilerC__.CompilerSteps;
 
-// TODO : Fix infinite loop on "imbriqué" + fix all tests bug + write manual + improve testing of runtime
+// TODO : Fix runtime_print test + write manual + improve testing of runtime
 
 namespace CompilerC__.src
 {

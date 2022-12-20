@@ -1,6 +1,6 @@
 ﻿int main() {
 	int a;
-	a = 0;
+	a = 1;
 
 	do
 	{
@@ -11,7 +11,7 @@
 			b = 1 + b;
 			int c;
 			c = 2 * b + a;
-		} while (b < 10);
+		} while (b < 3);
 		b = 1 + b;
-	} while (a < 10);
+	} while (a < 3);
 }

@@ -7,17 +7,17 @@
 		a = 1 + a;
 		int b;
 		b = 2;
-		if (a == 8)
+		if (a == 2)
 			continue;
 		do {
-			if(b==5)
-				continue;
 			b = 1 + b;
+			if(b==2)
+				continue;
 			int c;
 			c = 2 * b + a;
-		} while (b < 10);
-		if (a == 5)
+		} while (b < 3);
+		if (a == 2)
 			continue;
 		b = 1 + (2 * a);
-	} while (a < 10);
+	} while (a < 3);
 }
