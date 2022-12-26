@@ -1,6 +1,4 @@
-﻿#include <stdio.h>
-
-int a()
+﻿int a()
 {
 	int b;
 	b = 2 + 1;

@@ -2,7 +2,7 @@
   "profiles": {
     "CompilerC--": {
       "commandName": "Project",
-      "commandLineArgs": ".\r\n--simulator\r\n--test"
+      "commandLineArgs": "\"D:\\document\\Projet_cours\\CompilerC--\\test\\Runtime\\runtime_print.c\"\r\n--simulator\r\n--debug"
     }
   }
 }
