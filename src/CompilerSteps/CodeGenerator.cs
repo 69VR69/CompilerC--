@@ -113,6 +113,7 @@ namespace CompilerC__.CompilerSteps
                     break;
 
                 case "semicolon":
+                    GenerateCodeForChilds(root, sb);
                     sb.AppendLine("drop");
                     break;
 
