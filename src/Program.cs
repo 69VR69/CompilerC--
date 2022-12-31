@@ -3,8 +3,6 @@ using System.Text;
 
 using CompilerC__.CompilerSteps;
 
-// TODO : Fix runtime_print test + write manual + improve testing of runtime
-
 namespace CompilerC__.src
 {
     internal class Program
