@@ -18,14 +18,15 @@ namespace CompilerC__.CompilerSteps
         {
             get; set;
         }
-        private static Dictionary<string, int> LabelCounter { get; set; }
-        private static Dictionary<string, string> Labels { get; set; }
-
-        public CodeGenerator()
-        {
-            SemanticScanner = new SemanticScanner();
-            GeneratedCode = string.Empty;
-            Labels = new()
+        private static Dictionary<string, int> LabelCounter { get; set; } = new()
+            {
+                {"break",0 },
+                {"loop",0 },
+                {"continue",0 },
+                {"if",0 },
+                {"else",0 },
+            };
+        private readonly static Dictionary<string, string> Labels = new()
             {
                 {"break","lb" },
                 {"loop","ll" },
@@ -34,14 +35,11 @@ namespace CompilerC__.CompilerSteps
                 {"then","lt" },
                 {"else","le" },
             };
-            LabelCounter = new()
-            {
-                {"break",0 },
-                {"loop",0 },
-                {"continue",0 },
-                {"if",0 },
-                {"else",0 },
-            };
+
+        public CodeGenerator()
+        {
+            SemanticScanner = new SemanticScanner();
+            GeneratedCode = string.Empty;
         }
 
         public string GenerateCode(string fileName)
@@ -98,7 +96,7 @@ namespace CompilerC__.CompilerSteps
                     break;
 
                 case "ident":
-                    sb.AppendLine($"get {root.Address}");
+                    sb.AppendLine($"get {root.Address} ;variable {root.Value}");
                     break;
 
                 case "indirection":
@@ -122,7 +120,7 @@ namespace CompilerC__.CompilerSteps
                     {
                         GenerateNodeCode(root.Childs[1], sb);
                         sb.AppendLine($"dup");
-                        sb.AppendLine($"set {root.Childs[0].Address}");
+                        sb.AppendLine($"set {root.Childs[0].Address} ;variable {root.Childs[0].Value}");
                     }
                     else
                     {
@@ -198,24 +196,35 @@ namespace CompilerC__.CompilerSteps
                 ////////////////////////////////////////////////////////////////
 
                 case "loop":
-                    string tempLblbBreak = GetNewLabel("break", post: true);
-                    string tempLblbContinue = GetNewLabel("continue", post: true);
+                    string tempLblbBreak = GetNewLabel("break");
+                    string tempLblbContinue = GetNewLabel("continue");
                     string looplabel = GetNewLabel("loop");
 
                     sb.AppendLine($"\t; start of loop n°{GetLabelCounter(looplabel)}");
 
                     sb.AppendLine($".{looplabel}");
 
+                    SetImbricatedLoop(root);
                     GenerateCodeForChilds(root, sb);
 
                     sb.AppendLine($"jump {looplabel} ");
-                    sb.AppendLine($".lb{GetLabelCounter(tempLblbBreak) + 1}");
+                    sb.AppendLine($".lb{GetLabelCounter(tempLblbBreak)}");
 
+                    if (root.isImbriquated())
+                        sb.AppendLine($"\t; imbriquated => lb{GetLabelCounter(tempLblbBreak) - 1} && lc{GetLabelCounter(tempLblbContinue) - 1}");
 
                     sb.AppendLine($"\t; end of loop n°{GetLabelCounter(looplabel)}");
 
-                    SetLabelCounter(tempLblbBreak);
-                    SetLabelCounter(tempLblbContinue);
+                    if (root.isImbriquated())
+                    {
+                        SetLabelCounter(tempLblbBreak);
+                        SetLabelCounter(tempLblbContinue);
+                    }
+                    else if (root.Contains("loop", true))
+                    {
+                        SetLabelCounter(tempLblbBreak, 1);
+                        SetLabelCounter(tempLblbContinue, 1);
+                    }
                     break;
 
                 case "break":
@@ -320,14 +329,27 @@ namespace CompilerC__.CompilerSteps
         {
             return Labels[label] + (post ? LabelCounter[label]++ : ++LabelCounter[label]);
         }
-
         private static int GetLabelCounter(string label)
         {
             return int.Parse(label.Substring(2));
         }
-        private static void SetLabelCounter(string label)
+        private static void SetLabelCounter(string label, int modifier = -1)
         {
-            LabelCounter[Labels.FirstOrDefault(x => x.Value == Regex.Match(label, @"\D+").Value).Key] = int.Parse(Regex.Match(label, @"\d+").Value);
+            string labelType = Labels.FirstOrDefault(x => x.Value == label.Substring(0, 2)).Key;
+            int counter = int.Parse(label.Substring(2));
+            LabelCounter[labelType] = counter + modifier;
+        }
+
+        private static void SetImbricatedLoop(Node root)
+        {
+            foreach (Node child in root.Childs)
+            {
+                if (child.Type == "loop")
+                {
+                    child.Address = 1;
+                }
+                SetImbricatedLoop(child);
+            }
         }
 
         public static void AddFixedCode(StringBuilder sb)

@@ -225,9 +225,6 @@ namespace CompilerC__.CompilerSteps
                 Node e = Expression();
                 Accept("semicolon");
 
-                //if (e.Type == "call")
-                //return new Node(e, new Node("semicolon"));
-
                 return new Node("semicolon", e);
             }
 

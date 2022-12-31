@@ -14,7 +14,7 @@ namespace CompilerC__.Objects
 
         public string Type { get; set; }
         public string Value { get; set; }
-        public int? Address { get; set; } // maybe nbVar in case of functions
+        public int? Address { get; set; } // maybe nbVar in case of functions or isImbriqued in case of loop
         public int Line { get; set; }
         public List<Node> Childs { get; set; }
 
@@ -32,11 +32,11 @@ namespace CompilerC__.Objects
         public Node(Token token, bool withValue = false)
         {
             Type = token.Type;
-            Value = withValue? token.Value : string.Empty;
+            Value = withValue ? token.Value : string.Empty;
             Line = token.Line;
             Childs = new List<Node>();
         }
-        
+
         public Node(params Node[] childs)
         {
             Type = string.Empty;
@@ -44,8 +44,8 @@ namespace CompilerC__.Objects
             Line = 0;
             Childs = childs.ToList();
         }
-        
-        public Node(string type,params Node[] childs)
+
+        public Node(string type, params Node[] childs)
         {
             Type = type;
             Value = string.Empty;
@@ -86,6 +86,22 @@ namespace CompilerC__.Objects
         }
 
         #endregion Constructors
+
+        public bool Contains(string type, bool isRootIgnored = false)
+        {
+            if (!isRootIgnored && Type == type)
+                return true;
+
+            return Childs.Any(child => child.Contains(type));
+        }
+
+        public bool isImbriquated()
+        {
+            if (Address == 1)
+                return true;
+            else
+                return false;
+        }
 
         public override string ToString()
         {

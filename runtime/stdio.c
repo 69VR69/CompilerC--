@@ -15,7 +15,6 @@ int print (int n) {
     for (j = i - 1; j >= 0; j = j - 1)
     {
         send(digits[j] + 48);
-		
     }
 	
 	send(10);

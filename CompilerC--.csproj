@@ -41,6 +41,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ContentWithTargetPath Remove="test\Loop\1_test_andre.c" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ContentWithTargetPath Include="cygwin1.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <TargetPath>%(Filename)%(Extension)</TargetPath>
